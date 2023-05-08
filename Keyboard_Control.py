@@ -4,7 +4,7 @@ from time import sleep
 import cv2
 
 kp.init()
-me = tello.Tello()
+me = tello.Tello("192.168.0.214")
 me.connect()
 print("Batterylevel:", me.get_battery(), "%")
 
