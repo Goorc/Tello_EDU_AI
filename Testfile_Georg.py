@@ -1,5 +1,5 @@
 from djitellopy import tello
-#import KeyPressModule as kp
+import KeyPressModule as kp
 from time import sleep
 import cv2
 import numpy as np
@@ -10,16 +10,13 @@ def Yaw_follow(object_x, object_y, frame_width, frame_height):
     frame_center_x, frame_center_y = frame_width // 2, frame_height // 2
     x_offset = object_x - frame_center_x
 
-    # generate steering commands based on the position of the object
-    if x_offset < -10:
-        yv = -20
-    elif x_offset > 10:
-        yv = 20
-    else:
-        yv = 0
+    max_yv = 70
 
-    control_values = lr, fb, ud, yv
-    return control_values
+    # generate steering commands based on the position of the object
+    yv = int(x_offset/(0.5*frame_width)*max_yv)
+    print("Yaw_Follow:", yv)
+    rc_control = lr, fb, ud, yv
+    return rc_control
 #gets the coordinates of the recognized object on the picture and returns steering commands appropriate to keept said
 # object in the center of the frame by turning the drone about the yaw axis
 
@@ -53,34 +50,73 @@ def green_tracker(image):
     else:
         return None
 
-#kp.init()
+def overlay(img, x, y):
+    # Draw a red cross at the specified coordinates
+    cv2.line(img, (x - 10, y), (x + 10, y), (0, 0, 255), 2)
+    cv2.line(img, (x, y - 10), (x, y + 10), (0, 0, 255), 2)
+
+kp.init()
 me = tello.Tello()
 me.connect()
 print("Batterylevel:", me.get_battery(), "%")
 
 def getKeyboardInput():
-    lr, fb, ud, yv = 0,0,0,0
-    #if kp.getKey("q"): me.takeoff()
-    #if kp.getKey("e"): me.land()
 
-    return [lr, fb, ud, yv]
+    lr, fb, ud, yv = 0,0,0,0
+    manual_control = 1
+    speed = 50
+
+    if kp.getKey("LEFT"):
+        lr = -speed
+    elif kp.getKey("RIGHT"):
+        lr = speed
+
+    if kp.getKey("DOWN"):
+        fb = -speed
+    elif kp.getKey("UP"):
+        fb = speed
+
+    if kp.getKey("w"):
+        ud = speed
+    elif kp.getKey("s"):
+        ud = -speed
+
+    if kp.getKey("a"):
+        yv = -speed
+    elif kp.getKey("d"):
+        yv = speed
+
+    rc_control = [lr, fb, ud, yv, manual_control]
+    if all(elem == 0 for elem in rc_control[:4]):
+        rc_control[4] = 0
+
+    if kp.getKey("q"): me.takeoff()
+    if kp.getKey("e"): me.land()
+
+    return rc_control
 
 me.streamon()
-
-
+prev_rc_control = [0,0,0,0,1]
+rc_control = [0,0,0,0,1]
 while True:
     img = me.get_frame_read().frame
     img = cv2.resize(img, (360,240))
-    cv2.imshow("Image",img)
-    cv2.waitKey(1)
     # Get the height and width of the image
     height, width, channels = img.shape
 
     obj_cords = green_tracker(img)
-    if obj_cords is not None:
-        vals = Yaw_follow(obj_cords[0],obj_cords[1],width, height)
-    else:
-        vals = [0,0,0,-10]
-    print(vals)
-    #me.send_rc_control(vals[0], vals[1], vals[2],vals[3])
+    rc_control = getKeyboardInput()
+    if obj_cords is not None and rc_control[4] == 0:
+        rc_control[3] = Yaw_follow(obj_cords[0],obj_cords[1],width, height)[3]
+        overlay(img, obj_cords[0], obj_cords[1])
+    elif obj_cords is None and rc_control[4] == 0 and prev_rc_control[3] is not 0:
+        rc_control = prev_rc_control
+
+
+    print(rc_control)
+    me.send_rc_control(rc_control[0], rc_control[1], rc_control[2],rc_control[3])
+    prev_rc_control = rc_control
     sleep(0.05)
+
+    cv2.imshow("Image",img)
+    cv2.waitKey(1)
