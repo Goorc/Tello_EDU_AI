@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 import time
+from yolov7_package import Yolov7Detector
 
-class PersonDetector():
+class PersonDetectorYoloV3():
 
     def __init__(self,yoloConfig="yolov3.cfg", yoloWeights="yolov3.weights", yoloClasses="coco.names"):
         self.model = cv2.dnn.readNetFromDarknet(yoloConfig, yoloWeights)
@@ -54,13 +55,31 @@ class PersonDetector():
                 cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 2)
         return img
 
+
+class PersonDetectorYoloV7():
+
+    def __init__(self):
+        self.detector = Yolov7Detector(traced=False,img_size=(128,128))
+
+    def detect(self, img):
+        classes, boxes, scores = self.detector.detect(img)    
+        return classes, boxes, scores
+
+    def drawBoxesOnImg(self,img,classes, boxes, scores):
+        return self.detector.draw_on_image(img, boxes[0], scores[0], classes[0])
+
+
+
+
 #Only if this file is executed directly
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     ret, img = cap.read()
-    detector = PersonDetector(yoloConfig="yoloTest\yolov3.cfg", yoloWeights="yoloTest\yolov3.weights", yoloClasses="yoloTest\coco.names")
-    indices,boxes = detector.detect(img)
-    img = detector.drawBoxesOnImg(img,indices,boxes)
+    
+    # detector = PersonDetector(yoloConfig="yoloTest\yolov3.cfg", yoloWeights="yoloTest\yolov3.weights", yoloClasses="yoloTest\coco.names")
+    detector = PersonDetectorYoloV7()
+    classes, boxes, scores = detector.detect(img)
+    img = detector.drawBoxesOnImg(img,classes, boxes, scores)
     
     print("show image")
     cv2.imshow("test",img)
@@ -69,3 +88,5 @@ if __name__ == "__main__":
     while(True):
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
+
+
