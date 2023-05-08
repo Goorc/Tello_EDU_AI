@@ -29,7 +29,8 @@ while True:
 
     time3 = time.time()
 
-    img = detector.drawBoxesOnImg(img,classes, boxes, scores)
+    img = detector.drawBoxesOnImg(img)
+    img = detector.drawTrackPointOnImg(img)
 
     time4 = time.time()
 
