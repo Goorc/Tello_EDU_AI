@@ -6,7 +6,7 @@ import cv2
 import time
 
 kp.init()
-me = tello.Tello("192.168.0.214")
+me = tello.Tello()
 me.connect()
 print("Batterylevel:", me.get_battery(), "%")
 
@@ -25,7 +25,7 @@ while True:
 
     time2 = time.time()
 
-    classes, boxes, scores = detector.detect(img)
+    detector.detect(img)
 
     time3 = time.time()
 
