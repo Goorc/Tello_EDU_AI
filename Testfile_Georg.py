@@ -100,8 +100,8 @@ while True:
 
     keys_pressed = gui.getKeyboardInput()
     print(keys_pressed)
-    print(gui.flight_mode[0])
-    if "SPACE" in keys_pressed and "Auto" in gui.flight_mode[0]: #Search on
+    print(gui.flight_mode)
+    if "SPACE" in keys_pressed and "Auto" in gui.flight_mode: #Search on
         print("search on")
         obj_cords = green_tracker(img)
         rc_control = [0,0,0,20]

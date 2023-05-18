@@ -6,7 +6,7 @@ import numpy as np
 
 class GuiObject:
 
-    flight_mode = ["Manual",0,0]
+    flight_mode = "Manual"
     def __init__(self):
         # Initialize Pygame
         pygame.init()
@@ -32,13 +32,13 @@ class GuiObject:
         self.button2_x = self.button1_x + self.button_width + self.button_padding
         self.button2_y = self.button1_y
         self.button2_rect = pygame.Rect(self.button2_x, self.button2_y, self.button_width, self.button_height)
-        self.button2_caption = "Search"
+        self.button2_caption = "Auto"
 
         # Font setup
         self.font = pygame.font.Font(None, 24)  # Adjust the font properties as needed
 
         # Text field setup
-        self.text_field_rect = pygame.Rect(50, 50, 200, 30)
+        self.text_field_rect = pygame.Rect(50, 50, 75, 30)
         self.text_field_text = ""
     def getKeyboardInput(self):
         keys_pressed = []
@@ -85,10 +85,10 @@ class GuiObject:
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.button1_rect.collidepoint(mouse_pos):
-                    self.flight_mode = ["Manual", 0, 0]
+                    self.flight_mode = "Manual"
                     print(self.flight_mode)
                 elif self.button2_rect.collidepoint(mouse_pos):
-                    self.flight_mode = ["Auto", 0, 0]
+                    self.flight_mode = "Auto"
                     print(self.flight_mode)
 
         # Transpose and flip the image to correct the rotation
@@ -107,8 +107,16 @@ class GuiObject:
         self.window.blit(frame_surface, (0, 0))
 
         # Draw the buttons
-        pygame.draw.rect(self.window, (150, 150, 150), self.button1_rect)
-        pygame.draw.rect(self.window, (150, 150, 150), self.button2_rect)
+        color_active = (0,150,0)
+        color_inactive = (150, 150, 150)
+        if "Manual" in self.flight_mode:
+            pygame.draw.rect(self.window, color_active, self.button1_rect)
+            pygame.draw.rect(self.window, color_inactive, self.button2_rect)
+
+        elif "Auto" in self.flight_mode:
+            pygame.draw.rect(self.window, color_inactive, self.button1_rect)
+            pygame.draw.rect(self.window, color_active, self.button2_rect)
+
 
         # Render the button captions
         font = pygame.font.Font(None, 24)  # You can adjust the font size here
@@ -124,8 +132,11 @@ class GuiObject:
         self.window.blit(button2_text, button2_text_rect)
 
         # Render the text field
-        pygame.draw.rect(self.window, (200, 200, 200), self.text_field_rect)
-        text_surface = self.font.render(str(current_state["bat"]) + "%", True, (0, 0, 0))
+        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_rect)
+        bat_color = (0, 150, 0)
+        if current_state["bat"] < 30:
+            bat_color = (150,0,0)
+        text_surface = self.font.render("Bat: " +str(current_state["bat"]) + "%", True, bat_color)
         self.window.blit(text_surface, (self.text_field_rect.x + 5, self.text_field_rect.y + 5))
 
         # Update the display
