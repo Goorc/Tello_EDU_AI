@@ -58,8 +58,8 @@ class PersonDetectorYoloV3():
 
 class PersonDetectorYoloV7():
 
-    def __init__(self):
-        self.detector = Yolov7Detector(traced=False,img_size=(128,128),conf_thres=0.6)
+    def __init__(self,resolution=(128,128)):
+        self.detector = Yolov7Detector(traced=False,img_size=resolution,conf_thres=0.6)
         self.classes = None
         self.boxes = None
         self.scores = None
@@ -107,11 +107,9 @@ class PersonDetectorYoloV7():
 
             x = (x1+x2)/2
             y = (y1+y2)/2
-            self.trackedPoint = (int(x),int(y))
+            self.trackedPoint = {"x":int(x),"y":int(y),"imgWidth": img.shape[1],"imgHeight": img.shape[0]}
 
-        imgWidth = img.shape[1]
-        imgHeight = img.shape[0]
-
+        
         return self.trackedPoint
     
     def drawTrackPointOnImg(self,img):
@@ -121,8 +119,8 @@ class PersonDetectorYoloV7():
            #draw crosshair
             # black = np.zeros((480,640,3), np.uint8)
             # self.trackedPoint = (320,240)
-            cv2.line(img,(self.trackedPoint[0]-10,self.trackedPoint[1]),(self.trackedPoint[0]+10,self.trackedPoint[1]),(0,255,0),thickness=2)
-            cv2.line(img,(self.trackedPoint[0],self.trackedPoint[1]-10),(self.trackedPoint[0],self.trackedPoint[1]+10),(0,255,0),thickness=2)
+            cv2.line(img,(self.trackedPoint["x"]-10,self.trackedPoint["y"]),(self.trackedPoint["x"]+10,self.trackedPoint["y"]),(0,255,0),thickness=2)
+            cv2.line(img,(self.trackedPoint["x"],self.trackedPoint["y"]-10),(self.trackedPoint["x"],self.trackedPoint["y"]+10),(0,255,0),thickness=2)
 
            
             return img
