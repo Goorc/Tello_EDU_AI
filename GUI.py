@@ -6,7 +6,7 @@ import numpy as np
 
 class GuiObject:
 
-    menu = ["Manual",0,0]
+    flight_mode = ["Manual",0,0]
     def __init__(self):
         # Initialize Pygame
         pygame.init()
@@ -85,11 +85,11 @@ class GuiObject:
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.button1_rect.collidepoint(mouse_pos):
-                    self.menu = [1, 0, 0]
-                    print(self.menu)
+                    self.flight_mode = ["Manual", 0, 0]
+                    print(self.flight_mode)
                 elif self.button2_rect.collidepoint(mouse_pos):
-                    self.menu = [2, 0, 0]
-                    print(self.menu)
+                    self.flight_mode = ["Auto", 0, 0]
+                    print(self.flight_mode)
 
         # Transpose and flip the image to correct the rotation
         img = cv2.transpose(img)

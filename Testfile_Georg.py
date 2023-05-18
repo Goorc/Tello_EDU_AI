@@ -7,16 +7,16 @@ import numpy as np
 import logging
 logging.getLogger('djitellopy').setLevel(logging.WARNING)
 
-def Yaw_follow(object_x, object_y, frame_width, frame_height):
+def Yaw_follow(data):
     lr, fb, ud, yv = 0, 0, 0, 0
     # calculate the position of the object relative to the center of the frame
-    frame_center_x, frame_center_y = frame_width // 2, frame_height // 2
-    x_offset = object_x - frame_center_x
+    frame_center_x, frame_center_y = data["img_width"] // 2, data["img_height"] // 2
+    x_offset = data["x"] - frame_center_x
 
     max_yv = 70
 
     # generate steering commands based on the position of the object
-    yv = int(x_offset / (0.5 * frame_width) * max_yv)
+    yv = int(x_offset / (0.5 * data["img_width"]) * max_yv)
     rc_control = lr, fb, ud, yv
     print("Yaw_Follow:", rc_control)
     return rc_control
@@ -49,7 +49,9 @@ def green_tracker(image):
         moments = cv2.moments(biggest_contour)
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
-        return [cx, cy]
+        # Get the height and width of the image
+        height, width, channels = image.shape
+        return {"x": cx, "y": cy, "img_width": width, "img_height": height}
     else:
         return None
 
@@ -95,19 +97,17 @@ gui.draw(me.get_frame_read().frame,me.get_current_state())
 
 while True:
     img = me.get_frame_read().frame
-    # Get the height and width of the image
-    height, width, channels = img.shape
 
     keys_pressed = gui.getKeyboardInput()
     print(keys_pressed)
-    print(gui.menu[0])
-    if "SPACE" in keys_pressed and gui.menu[0] == 2: #Search on
+    print(gui.flight_mode[0])
+    if "SPACE" in keys_pressed and "Auto" in gui.flight_mode[0]: #Search on
         print("search on")
         obj_cords = green_tracker(img)
         rc_control = [0,0,0,20]
         if obj_cords is not None: #if Object found then track
-            rc_control = Yaw_follow(obj_cords[0], obj_cords[1], width, height)
-            gui.overlay(img, obj_cords[0], obj_cords[1])
+            rc_control = Yaw_follow(obj_cords)
+            gui.overlay(img, obj_cords["x"], obj_cords["y"])
     else:   #Manual
         rc_control = keyboard2control(keys_pressed)
 
