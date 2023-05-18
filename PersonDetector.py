@@ -107,11 +107,10 @@ class PersonDetectorYoloV7():
 
             x = (x1+x2)/2
             y = (y1+y2)/2
-            self.trackedPoint = {"x":int(x),"y":int(y),"imgWidth": img.shape[1],"imgHeight": img.shape[0]}
+            self.trackedPoint = {"x":int(x),"y":int(y),"img_width": img.shape[1],"img_height": img.shape[0]}
+            return self.trackedPoint
+        return None
 
-        
-        return self.trackedPoint
-    
     def drawTrackPointOnImg(self,img):
         if(self.trackedPoint is None):
             return img
