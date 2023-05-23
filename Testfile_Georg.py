@@ -114,4 +114,10 @@ while True:
     me.send_rc_control(rc_control[0], rc_control[1], rc_control[2], rc_control[3])
     sleep(0.05)
 
+    #Printing TOF sensor
+    state = me.get_current_state()
+    tof_value = state['tof']
+
+    print("ToF value:", tof_value, "cm")
+
     gui.draw(img,me.get_current_state())
