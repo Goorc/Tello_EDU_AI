@@ -14,25 +14,16 @@ class PersonDetectorYoloV7():
         self.scores = None
         self.detections = None
 
-        self.point_distance_factor = 1.5
-        self.score_factor = 0.25
-
-        self.trackedPerson = None    
-        # self.trackedPersonBox = None
-        # self.trackedPersonScore = None
-        # self.trackedPoint = None
+        self.trackedPerson = None
 
     def detect(self, img):
         classes, boxes, scores = self.detector.detect(img)    
         
-        self.classes = []
-        self.boxes = []
-        self.scores = []
-
         self.detections = []
 
         self.trackedPersonBox = None
-        self.trackedPersonScore = None
+
+        
 
         for i in range(len(classes[0])):
             if(classes[0][i] == 0):
@@ -40,13 +31,33 @@ class PersonDetectorYoloV7():
                 detection = {"center":centerPoint,"box": boxes[0][i],"score":scores[0][i]}
                 self.detections.append(detection)
 
+        if(len(self.detections) == 0):
+            print("No Person detected")
+            self.trackedPerson = None
+            return None
+
         #if there is no tracked Person yet search for detection with highest score
         if(self.trackedPerson == None):
+            for detection in self.detections:
+                if(self.trackedPerson == None or detection["score"] > self.trackedPerson["score"]):
+                    self.trackedPerson = detection
+        #if there is a tracked Person searc for detection with closest center point
+        else:
+            closestDetection = 1000000
+            newTrackedPerson = None
+            for detection in self.detections:
+                distance = self.calcDistance(self.trackedPerson["center"],detection["center"])
+                if(distance < closestDetection):
+                    closestDetection = distance
+                    newTrackedPerson = detection
+            self.trackedPerson = newTrackedPerson
 
-            
 
 
-
+    def calcDistance(self,point1,point2):
+        x1,y1 = point1
+        x2,y2 = point2
+        return math.sqrt((x2-x1)**2+(y2-y1)**2)
 
 
 
@@ -58,14 +69,13 @@ class PersonDetectorYoloV7():
     
 
     def drawTrackPointOnImg(self,img):
-        if(self.trackedPoint is None):
+        if(self.trackedPerson is None):
             return img
         else:
-           #draw crosshair
-            # black = np.zeros((480,640,3), np.uint8)
-            # self.trackedPoint = (320,240)
-            cv2.line(img,(self.trackedPoint["x"]-10,self.trackedPoint["y"]),(self.trackedPoint["x"]+10,self.trackedPoint["y"]),(0,255,0),thickness=2)
-            cv2.line(img,(self.trackedPoint["x"],self.trackedPoint["y"]-10),(self.trackedPoint["x"],self.trackedPoint["y"]+10),(0,255,0),thickness=2)
+            center = self.trackedPerson["center"]
+            x = int(center[0])
+            y = int(center[1])
+            cv2.circle(img,(x,y),5,(0,255,0),thickness=2)
 
            
             return img
