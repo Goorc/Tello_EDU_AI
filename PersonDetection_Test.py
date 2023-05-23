@@ -38,7 +38,7 @@ while True:
     # print("Time to detect:", time3-time2)
     # print("Time to draw:", time4-time3)
 
-    print("FPS:", 1/(time4-time1))
+    # print("FPS:", 1/(time4-time1))
 
     cv2.imshow("Image",img)
     cv2.waitKey(1)    

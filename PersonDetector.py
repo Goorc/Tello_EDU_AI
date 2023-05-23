@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+import math
 from yolov7_package import Yolov7Detector
 
 class PersonDetectorYoloV3():
@@ -63,10 +64,15 @@ class PersonDetectorYoloV7():
         self.classes = None
         self.boxes = None
         self.scores = None
+        self.detections = None
 
-        self.trackedPersonBox = None
-        self.trackedPersonScore = None
-        self.trackedPoint = None
+        self.point_distance_factor = 1.5
+        self.score_factor = 0.25
+
+        self.trackedPerson = None    
+        # self.trackedPersonBox = None
+        # self.trackedPersonScore = None
+        # self.trackedPoint = None
 
     def detect(self, img):
         classes, boxes, scores = self.detector.detect(img)    
@@ -75,41 +81,33 @@ class PersonDetectorYoloV7():
         self.boxes = []
         self.scores = []
 
+        self.detections = []
+
         self.trackedPersonBox = None
         self.trackedPersonScore = None
 
-
         for i in range(len(classes[0])):
             if(classes[0][i] == 0):
+                centerPoint = self.calcBoxCenter(boxes[0][i])
+                detection = {"center":centerPoint,"box": boxes[0][i],"score":scores[0][i]}
+                self.detections.append(detection)
 
-                if(self.trackedPersonScore is None):
-                    self.trackedPersonScore = scores[0][i]
-                    self.trackedPersonBox = boxes[0][i]
-                else:
-                    if(scores[0][i] > self.trackedPersonScore):
-                        self.trackedPersonScore = scores[0][i]
-                        self.trackedPersonBox = boxes[0][i]
-                
-
-                # boxes[0][i][0] = 100
-                # boxes[0][i][1] = 90
-                # boxes[0][i][2] = 300
-                # boxes[0][i][3] = 100
-
-                self.classes.append(classes[0][i])
-                self.boxes.append(boxes[0][i])
-                self.scores.append(scores[0][i])
+        #if there is no tracked Person yet search for detection with highest score
+        if(self.trackedPerson == None):
 
             
-        if(self.trackedPersonBox is not None):
-            
-            x1,y1,x2,y2 = self.trackedPersonBox
 
-            x = (x1+x2)/2
-            y = (y1+y2)/2
-            self.trackedPoint = {"x":int(x),"y":int(y),"img_width": img.shape[1],"img_height": img.shape[0]}
-            return self.trackedPoint
-        return None
+
+
+
+
+
+    def calcBoxCenter(self,box):
+        x1,y1,x2,y2 = box
+        x = (x1+x2)/2
+        y = (y1+y2)/2
+        return (x,y)
+    
 
     def drawTrackPointOnImg(self,img):
         if(self.trackedPoint is None):
