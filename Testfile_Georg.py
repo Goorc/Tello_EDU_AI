@@ -1,4 +1,5 @@
 import GUI
+import Auto_pattern
 from djitellopy import tello
 from time import sleep
 import cv2
@@ -90,14 +91,15 @@ def keyboard2control(keys_pressed):
     return rc_control
 
 
-gui = GUI.GuiObject()
+
+
 me = tello.Tello()
 me.connect()
-print("Batterylevel:", me.get_battery(), "%")
-print(me.get_current_state())
+gui = GUI.GuiObject()
+position = Auto_pattern.Auto_search(me.get_current_state(),100,100)
 me.streamon()
 rc_control = [0, 0, 0, 0]
-gui.draw(me.get_frame_read().frame,me.get_current_state())
+gui.draw(me.get_frame_read().frame,me.get_current_state(),position.relative_position)
 person_detector = PersonDetectorYoloV7()
 
 while True:
@@ -106,12 +108,14 @@ while True:
     keys_pressed = gui.getKeyboardInput()
     print(keys_pressed)
     print(gui.flight_mode)
+    position.update_relative_position(me.get_current_state())
+    print(position.relative_position)
     if "SPACE" in keys_pressed and "Auto" in gui.flight_mode: #Search on
         print("search on")
         obj_cords = person_tracker(img)
-        rc_control = [0,0,0,20]
         if obj_cords is not None: #if Object found then track
-            rc_control = Yaw_follow(obj_cords)
+            rc_control = keyboard2control(keys_pressed)
+            rc_control[3] = Yaw_follow(obj_cords)[3]
             gui.overlay(img, obj_cords["x"], obj_cords["y"])
     else:   #Manual
         rc_control = keyboard2control(keys_pressed)
@@ -119,10 +123,4 @@ while True:
     me.send_rc_control(rc_control[0], rc_control[1], rc_control[2], rc_control[3])
     sleep(0.05)
 
-    #Printing TOF sensor
-    state = me.get_current_state()
-    tof_value = state['tof']
-
-    print("ToF value:", tof_value, "cm")
-
-    gui.draw(img,me.get_current_state())
+    gui.draw(img,me.get_current_state(),position.relative_position)

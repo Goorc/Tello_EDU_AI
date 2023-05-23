@@ -38,8 +38,11 @@ class GuiObject:
         self.font = pygame.font.Font(None, 24)  # Adjust the font properties as needed
 
         # Text field setup
-        self.text_field_rect = pygame.Rect(50, 50, 75, 30)
-        self.text_field_text = ""
+        self.text_field_bat_rect = pygame.Rect(50, 50, 75, 30)
+        self.text_field_bat_text = ""
+
+        self.text_field_pos_rect = pygame.Rect(50, 15, 350, 30)
+        self.text_field_pos_text = ""
     def getKeyboardInput(self):
         keys_pressed = []
         if self.getKey("LEFT"):
@@ -78,7 +81,7 @@ class GuiObject:
         return ans
 
     # Run the main game loop
-    def draw(self, img, current_state):
+    def draw(self, img, current_state,relative_position):
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
@@ -131,13 +134,19 @@ class GuiObject:
         self.window.blit(button1_text, button1_text_rect)
         self.window.blit(button2_text, button2_text_rect)
 
-        # Render the text field
-        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_rect)
+        # Render the text fields
+        #Bat
+        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_bat_rect)
         bat_color = (0, 150, 0)
         if current_state["bat"] < 30:
             bat_color = (150,0,0)
-        text_surface = self.font.render("Bat: " +str(current_state["bat"]) + "%", True, bat_color)
-        self.window.blit(text_surface, (self.text_field_rect.x + 5, self.text_field_rect.y + 5))
+        text_surface_bat = self.font.render("Bat: " +str(current_state["bat"]) + "%", True, bat_color)
+        self.window.blit(text_surface_bat, (self.text_field_bat_rect.x + 5, self.text_field_bat_rect.y + 5))
+        #Positiion
+        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_pos_rect)
+        pos_color = (0, 150, 0)
+        text_surface_pos = self.font.render("relative_position [cm]:   X: " + str(round(relative_position["x"], 1)) + "   Y: " + str(round(relative_position["y"], 1)) + "   Z: " + str(round(relative_position["z"], 1)), True, bat_color)
+        self.window.blit(text_surface_pos, (self.text_field_pos_rect.x + 5, self.text_field_pos_rect.y + 5))
 
         # Update the display
         pygame.display.update()
