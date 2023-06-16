@@ -1,7 +1,7 @@
 import time
 import math
 import numpy as np
-class Auto_search:
+class Waypoint_navigation:
 
     relative_position = {} #the position of the drone relative to the point where the self.__init__() is called
     start_time = 0
@@ -13,7 +13,7 @@ class Auto_search:
     relative_waypoints = []  # List of dictionaries of the relative_waypoints in the Auto_search
     waypoints = []
     nextWaypointIndex = 0   # Indicates which waypoint is the next to be reached in  Auto_search()
-    Auto_search_active = False  # is used as a status indicator to whether the automatic search is active or not
+    navigator_active = False  # is used as a status indicator to whether the automatic search is active or not
 
     def __init__(self, current_state, search_area_width=20, search_area_depth=20):
         self.previous_state = current_state
@@ -57,7 +57,7 @@ class Auto_search:
         self.calculateWaypoints()
 
     #returns the steering inputs for the Tello drone to follow the calculated Waypoints
-    def Auto_search(self, current_state):
+    def navigate(self, current_state):
         lr, fb, ud, yv = 0, 0, 0, 0
         self.update_relative_position(current_state)
 
@@ -130,7 +130,7 @@ class Auto_search:
 
 if __name__ == '__main__':
     test_current_state = {"vgx": 0,"vgy":0,"vgz":0,"yaw":0}
-    auto_search = Auto_search(test_current_state)
+    auto_search = Waypoint_navigation(test_current_state)
 
     test_waypoints = []
     test_waypoints.append({"x":0,"y":0})

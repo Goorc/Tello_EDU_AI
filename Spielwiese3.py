@@ -1,5 +1,5 @@
 import GUI
-import Auto_pattern
+import Waypoint_navigation
 from djitellopy import tello
 from time import sleep
 import cv2
@@ -99,10 +99,10 @@ def keyboard2control(keys_pressed):
 me = tello.Tello()
 me.connect()
 gui = GUI.GuiObject()
-AutoSearch = Auto_pattern.Auto_search(me.get_current_state())
+waypoint_navigator = Waypoint_navigation.Waypoint_navigation(me.get_current_state())
 me.streamon()
 rc_control = [0, 0, 0, 0]
-gui.draw(me.get_frame_read().frame, me.get_current_state(), AutoSearch.relative_position)
+gui.draw(me.get_frame_read().frame, me.get_current_state(), waypoint_navigator.relative_position)
 person_detector = PersonDetectorYoloV7()
 print(me.get_current_state())
 while True:
@@ -113,24 +113,24 @@ while True:
     #Converting keyboard inputs into control commands for Tello
     rc_control = keyboard2control(keys_pressed)
     #Updating relative Position of Tello
-    AutoSearch.update_relative_position(me.get_current_state())
+    waypoint_navigator.update_relative_position(me.get_current_state())
     if "Auto" in gui.flight_mode:  # Flight mode is Auto
-        if not AutoSearch.Auto_search_active: #Check if first loop where flight mode is Auto to set mission start point
-            AutoSearch.reset_relative_position(me.get_current_state())
-            AutoSearch.Auto_search_active = True
+        if not waypoint_navigator.Auto_search_active: #Check if first loop where flight mode is Auto to set mission start point
+            waypoint_navigator.reset_relative_position(me.get_current_state())
+            waypoint_navigator.navigator_active = True
         if "SPACE" in keys_pressed: #if flight mode is Auto Space as dead man switch is pressed drone follows Waypoints
             obj_cords = person_tracker(img)
-            rc_control = AutoSearch.Auto_search(me.get_current_state())
+            rc_control = waypoint_navigator.navigate(me.get_current_state())
             print("Yaw: " + str(me.get_yaw()))
-            print(AutoSearch.relative_position)
+            print(waypoint_navigator.relative_position)
             print(rc_control)
     else:  # Flight mode is Manual
-        AutoSearch.Auto_search_active = False
+        waypoint_navigator.navigator_active = False
 
     #Sending rc controls either set by keyboard input or Algorithm to drone
     me.send_rc_control(rc_control[0], rc_control[1], rc_control[2], rc_control[3])
     sleep(0.05)
 
     #drawing the Gui including camera feed
-    gui.draw(img, me.get_current_state(), AutoSearch.relative_position)
+    gui.draw(img, me.get_current_state(), waypoint_navigator.relative_position)
     #print("Yaw: "+str(me.get_yaw()))
