@@ -10,7 +10,7 @@ class Auto_search:
     maxControlInput = 30  # the maximum control input of the Auto_search algorithme per control axis
     minControlInput = 20  # should not be necessary, but below a certain speed the drone does not register a movement and therefore the relative position does not change
     view_distance = 3  # determines how far the drone can recognize a human, mainly influences the granularity of the search pattern
-    relative_waypoints = []  # List of dictionaries of the waypoints in the Auto_search
+    relative_waypoints = []  # List of dictionaries of the relative_waypoints in the Auto_search
     waypoints = []
     nextWaypointIndex = 0   # Indicates which waypoint is the next to be reached in  Auto_search()
     Auto_search_active = False  # is used as a status indicator to whether the automatic search is active or not
@@ -110,5 +110,31 @@ class Auto_search:
         return rc_control
 
 
+    def calculateWaypoints(self):
+        #this function transforms the relative waypoints into absolute waypoints. relative_position is used as coordination system
+        point_zero = self.relative_position
+        yaw = math.radians(point_zero["yaw"])
 
+        for rwp in self.relative_waypoints:
+            x_new = point_zero["x"] + math.cos(yaw)*rwp["x"] + math.sin(yaw)*rwp["y"]
+            y_new = point_zero["y"] + -math.sin(yaw)*rwp["x"] + math.cos(yaw)*rwp["y"]
+            self.waypoints.append({"x":x_new,"y":y_new})
+
+
+if __name__ == '__main__':
+    test_current_state = {"vgx": 0,"vgy":0,"vgz":0,"yaw":0}
+    auto_search = Auto_search(test_current_state)
+
+    test_waypoints = []
+    test_waypoints.append({"x":0,"y":0})
+    test_waypoints.append({"x":1,"y":0})
+    test_waypoints.append({"x":0,"y":1})
+
+    auto_search.relative_waypoints = test_waypoints
+
+    auto_search.relative_position["x"] = 5
+    auto_search.relative_position["y"] = 7.5
+    auto_search.relative_position["yaw"] = 90
+    auto_search.calculateWaypoints()
+    print("done")
 
