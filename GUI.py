@@ -81,7 +81,7 @@ class GuiObject:
         return ans
 
     # Run the main game loop
-    def draw(self, img, current_state,relative_position):
+    def draw(self, img, current_state,relative_position= None):
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
@@ -89,10 +89,8 @@ class GuiObject:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.button1_rect.collidepoint(mouse_pos):
                     self.flight_mode = "Manual"
-                    print(self.flight_mode)
                 elif self.button2_rect.collidepoint(mouse_pos):
                     self.flight_mode = "Auto"
-                    print(self.flight_mode)
 
         # Transpose and flip the image to correct the rotation
         img = cv2.transpose(img)
@@ -142,10 +140,19 @@ class GuiObject:
             bat_color = (150,0,0)
         text_surface_bat = self.font.render("Bat: " +str(current_state["bat"]) + "%", True, bat_color)
         self.window.blit(text_surface_bat, (self.text_field_bat_rect.x + 5, self.text_field_bat_rect.y + 5))
-        #Positiion
+        #Position
+        if relative_position is not None:
+            pos_x = str(round(relative_position["x"], 1))
+            pos_y = str(round(relative_position["y"], 1))
+            pos_z = str(round(relative_position["z"], 1))
+        else:
+            pos_x = "Na"
+            pos_y = "Na"
+            pos_z = "Na"
+
         pygame.draw.rect(self.window, (0, 0, 0), self.text_field_pos_rect)
         pos_color = (0, 150, 0)
-        text_surface_pos = self.font.render("relative_position [cm]:   X: " + str(round(relative_position["x"], 1)) + "   Y: " + str(round(relative_position["y"], 1)) + "   Z: " + str(round(relative_position["z"], 1)), True, bat_color)
+        text_surface_pos = self.font.render("relative_position [cm]:   X: " + pos_x + "   Y: " + pos_y + "   Z: " + pos_z, True, bat_color)
         self.window.blit(text_surface_pos, (self.text_field_pos_rect.x + 5, self.text_field_pos_rect.y + 5))
 
         # Update the display

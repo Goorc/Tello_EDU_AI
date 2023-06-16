@@ -113,6 +113,7 @@ while True:
     if "SPACE" in keys_pressed and "Auto" in gui.flight_mode: #Search on
         print("search on")
         obj_cords = person_tracker(img)
+        rc_control = keyboard2control(keys_pressed)
         if obj_cords is not None: #if Object found then track
             rc_control = keyboard2control(keys_pressed)
             rc_control[3] = Yaw_follow(obj_cords)[3]
