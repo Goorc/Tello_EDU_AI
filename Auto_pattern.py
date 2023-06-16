@@ -10,7 +10,8 @@ class Auto_search:
     maxControlInput = 30  # the maximum control input of the Auto_search algorithme per control axis
     minControlInput = 20  # should not be necessary, but below a certain speed the drone does not register a movement and therefore the relative position does not change
     view_distance = 3  # determines how far the drone can recognize a human, mainly influences the granularity of the search pattern
-    waypoints = []  # List of dictionaries of the waypoints in the Auto_search
+    relative_waypoints = []  # List of dictionaries of the waypoints in the Auto_search
+    waypoints = []
     nextWaypointIndex = 0   # Indicates which waypoint is the next to be reached in  Auto_search()
     Auto_search_active = False  # is used as a status indicator to whether the automatic search is active or not
 
@@ -24,13 +25,13 @@ class Auto_search:
         i_x = 0
         while i_x*self.view_distance < self.search_area["depth"]:
             if (i_x % 2) == 0:
-                self.waypoints.append({"y": 0, "x": i_x*self.view_distance})
-                self.waypoints.append({"y": self.search_area["width"], "x": i_x*self.view_distance})
+                self.relative_waypoints.append({"y": 0, "x": i_x*self.view_distance})
+                self.relative_waypoints.append({"y": self.search_area["width"], "x": i_x*self.view_distance})
             else:
-                self.waypoints.append({"y": self.search_area["width"], "x": i_x*self.view_distance})
-                self.waypoints.append({"y": 0, "x": i_x*self.view_distance})
+                self.relative_waypoints.append({"y": self.search_area["width"], "x": i_x*self.view_distance})
+                self.relative_waypoints.append({"y": 0, "x": i_x*self.view_distance})
             i_x = i_x+1
-        self.waypoints.append({"y": 0, "x": 0})  # Last Waypoint will always be point of mission Start
+        self.relative_waypoints.append({"y": 0, "x": 0})  # Last Waypoint will always be point of mission Start
 
     # Tracks the relative position of the drone in relation to the position of the initialization of the Object
     # the unit should be cm since vgx is in cm/s and time.time() in seconds but this does not really match
@@ -58,32 +59,56 @@ class Auto_search:
     def Auto_search(self, current_state):
         lr, fb, ud, yv = 0, 0, 0, 0
         self.update_relative_position(current_state)
+
+        distance_to_waypoint = math.sqrt((self.relative_waypoints[self.nextWaypointIndex]["y"]-self.relative_position["y"])**2 +
+                                (self.relative_waypoints[self.nextWaypointIndex]["x"]-self.relative_position["x"])**2)
         #Proportional Controller for reaching the waypoint with maximum Speed of SearchSpeed
         pGain =5
 
-        #left-right
-        lr = int(pGain * (self.waypoints[self.nextWaypointIndex]["y"] - self.relative_position["y"]))
-        if abs(lr) > self.maxControlInput:
-            lr = int(lr/abs(lr)*self.maxControlInput)
-        elif 0 < abs(lr) < self.minControlInput:
-            lr = int(lr / abs(lr) * self.minControlInput)
-        #front-back
-        fb = int(pGain * (self.waypoints[self.nextWaypointIndex]["x"] - self.relative_position["x"]))
-        if abs(fb) > self.maxControlInput:
-            fb = int(fb / abs(fb) * self.maxControlInput)
-        elif 0 < abs(fb) < self.minControlInput:
-            fb = int(fb / abs(fb) * self.minControlInput)
+        vec_to_waypoint = np.array([self.waypoints[self.nextWaypointIndex]["x"]-self.relative_position["x"],
+                                    self.waypoints[self.nextWaypointIndex]["y"]-self.relative_position["y"]])
 
+        #  calculating the angle between vec_to_waypoint and the vector [0,1] ot get the angle to be rotated
+        vec_forward = np.array([1,0])
+        dot_product = np.dot(vec_to_waypoint, vec_forward)
+        magnitude1 = np.linalg.norm(vec_to_waypoint)
+        magnitude2 = np.linalg.norm(vec_forward)
+        cosine_angle = dot_product / (magnitude1 * magnitude2)
+        angle = np.degrees(np.arccos(cosine_angle))
 
+        # if vec_to_waypoint points into left half plane angle is supposed to be negative
+        if vec_to_waypoint["x"] < 0:
+            angle = -angle
 
-        distance_to_waypoint = math.sqrt((self.waypoints[self.nextWaypointIndex]["y"]-self.relative_position["y"])**2 +
-                                (self.waypoints[self.nextWaypointIndex]["x"]-self.relative_position["x"])**2)
-        #print("Current Waypoint:" + str(self.waypoints[self.nextWaypointIndex]))
+        #  value positive if drone has to rotate clockwise negative if counterclockwise rotation is needed to correct
+        yaw_error = angle - current_state["yaw"]
+        yaw_error_normalized = yaw_error/180
 
-        if distance_to_waypoint < 1:  # Detecting if waypoint is reached
+        # P controller for Yaw error
+        max_yv = 70
+        yv = int(yaw_error_normalized * max_yv)
+
+        #Case1: yaw error to big, either because of new waypoint or because disturbance of outside
+        if yaw_error > 10:
+            lr, fb, ud = 0, 0, 0
+
+        #Case2: align yaw AND fly towards it by flying forward, the closer the distance to the waypoint, the slower the speed
+        else:
+            fb = int(pGain*magnitude1)
+            if abs(fb) > self.maxControlInput:
+                fb = int(fb / abs(fb) * self.maxControlInput)
+            elif 0 < abs(fb) < self.minControlInput:
+                fb = int(fb / abs(fb) * self.minControlInput)
+
+        # Detecting if waypoint is reached
+        if distance_to_waypoint < 1:
             self.nextWaypointIndex = self.nextWaypointIndex + 1
-            if self.nextWaypointIndex > len(self.waypoints)-1:  # Stay at last waypoint if it is reached
+            if self.nextWaypointIndex > len(self.relative_waypoints)-1:  # Stay at last waypoint if it is reached
                 self.nextWaypointIndex = self.nextWaypointIndex - 1
                 lr, fb, ud, yv = 0, 0, 0, 0
         rc_control = lr, fb, ud, yv
         return rc_control
+
+
+
+
