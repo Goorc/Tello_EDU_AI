@@ -102,7 +102,7 @@ gui = GUI.GuiObject()
 waypoint_navigator = Waypoint_navigation.Waypoint_navigation(me.get_current_state())
 me.streamon()
 rc_control = [0, 0, 0, 0]
-gui.draw(me.get_frame_read().frame, me.get_current_state(), waypoint_navigator.relative_position)
+gui.draw(me.get_frame_read().frame, me.get_current_state(), waypoint_navigator.position)
 person_detector = PersonDetectorYoloV7()
 print(me.get_current_state())
 while True:
@@ -113,17 +113,17 @@ while True:
     #Converting keyboard inputs into control commands for Tello
     rc_control = keyboard2control(keys_pressed)
     #Updating relative Position of Tello
-    waypoint_navigator.update_relative_position(me.get_current_state())
+    waypoint_navigator.update_position(me.get_current_state())
     if "Auto" in gui.flight_mode:  # Flight mode is Auto
-        if not waypoint_navigator.Auto_search_active: #Check if first loop where flight mode is Auto to set mission start point
-            waypoint_navigator.reset_relative_position(me.get_current_state())
+        if not waypoint_navigator.navigator_active: #Check if first loop where flight mode is Auto to calculate position of Waypoints in world coordinate system
+            waypoint_navigator.calculateWaypoints()
             waypoint_navigator.navigator_active = True
         if "SPACE" in keys_pressed: #if flight mode is Auto Space as dead man switch is pressed drone follows Waypoints
             obj_cords = person_tracker(img)
             rc_control = waypoint_navigator.navigate(me.get_current_state())
-            print("Yaw: " + str(me.get_yaw()))
-            print(waypoint_navigator.relative_position)
-            print(rc_control)
+            #print("Yaw: " + str(me.get_yaw()))
+            #print(waypoint_navigator.position)
+            #print(rc_control)
     else:  # Flight mode is Manual
         waypoint_navigator.navigator_active = False
 
@@ -132,5 +132,5 @@ while True:
     sleep(0.05)
 
     #drawing the Gui including camera feed
-    gui.draw(img, me.get_current_state(), waypoint_navigator.relative_position)
+    gui.draw(img, me.get_current_state(), waypoint_navigator.position)
     #print("Yaw: "+str(me.get_yaw()))
