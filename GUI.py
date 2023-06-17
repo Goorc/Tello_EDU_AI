@@ -11,9 +11,13 @@ class GuiObject:
         # Initialize Pygame
         pygame.init()
 
+        # Initialize video feed size
+        self.image_width = 640
+        self.image_height = 480
+
         # Set up the Pygame window
-        self.window_width = 640
-        self.window_height = 480
+        self.window_width = 1280
+        self.window_height = 720
         self.window = pygame.display.set_mode((self.window_width, self.window_height))
         pygame.display.set_caption("Tello_EDU_AI GUI")
 
@@ -35,17 +39,34 @@ class GuiObject:
         self.button2_caption = "Auto"
 
         # Font setup
-        self.font = pygame.font.Font(None, 24)  # Adjust the font properties as needed
+        self.font = pygame.font.SysFont("consolas", 24)  # Adjust the font properties as needed
 
         # Text field setup
-        self.text_field_bat_rect = pygame.Rect(50, 50, 75, 30)
-        self.text_field_bat_text = ""
-
-        self.text_field_pos_rect = pygame.Rect(50, 15, 350, 30)
+        self.text_field_pos_rect = pygame.Rect(self.image_width+50, 15, 500, 30)
         self.text_field_pos_text = ""
 
-        self.text_field_status_rect = pygame.Rect(50, self.window_height-120, 450, 30)
+        self.text_field_bat_rect = pygame.Rect(self.image_width+50, 60, 180, 30)
+        self.text_field_bat_text = ""
+
+        self.text_field_status_rect = pygame.Rect(50, self.window_height-120, 700, 30)
         self.text_field_status_text = ""
+
+        # Text input setup
+        self.search_area_name = self.font.render(" Search Area", True, (0, 0, 0))
+        self.depth_name = self.font.render(" Depth:", True, (0, 0, 0))
+        self.height_name = self.font.render(" Height:", True, (0, 0, 0))
+        self.depth_rect = pygame.Rect(self.image_width+160, 200, 200, 40)
+        self.height_rect = pygame.Rect(self.image_width+160, 250, 200, 40)
+        self.depth_text = "10"  # Default depth value
+        self.height_text = "10"  # Default height value
+        self.selected_input = None
+
+    def is_integer(self,string):
+        try:
+            int(string)
+            return True
+        except ValueError:
+            return False
     def getKeyboardInput(self):
         keys_pressed = []
         if self.getKey("LEFT"):
@@ -88,12 +109,43 @@ class GuiObject:
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if self.depth_text == "":
+                        self.depth_text = "10"
+                    if self.height_text == "":
+                        self.height_text = "10"
+
+                    if self.is_integer(self.depth_text) and self.is_integer(self.height_text):
+                        print("Depth:", self.depth_text)  # Replace with your desired logic
+                        print("Height:", self.height_text)  # Replace with your desired logic
+                    else:
+                        print("Invalid input")
+                    self.selected_input = None
+                elif event.key == pygame.K_BACKSPACE:
+                    if self.selected_input == "height":
+                        self.height_text = self.height_text[:-1]
+                    else:
+                        self.depth_text = self.depth_text[:-1]
+                elif event.key <= 127:  # Ignore non-ASCII characters
+                    char = chr(event.key)
+                    if char.isdigit():
+                        if self.selected_input == "height":
+                            self.height_text += char
+                        else:
+                            self.depth_text += char
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.button1_rect.collidepoint(mouse_pos):
                     self.flight_mode = "Manual"
                 elif self.button2_rect.collidepoint(mouse_pos):
                     self.flight_mode = "Auto"
+                elif self.depth_rect.collidepoint(mouse_pos):
+                    self.selected_input = "depth"
+                elif self.height_rect.collidepoint(mouse_pos):
+                    self.selected_input = "height"
+        # Gray background for the window
+        self.window.fill((220, 220, 220))
 
         #drawing tracking point on img
         if "person_cords" in data_for_osd:
@@ -103,9 +155,7 @@ class GuiObject:
 
         # Transpose and flip the image to correct the rotation
         img = cv2.transpose(img)
-        img = cv2.resize(img, (480, 640))
-
-
+        img = cv2.resize(img, (self.image_height, self.image_width))
 
         # Convert the frame from BGR to RGB
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -129,7 +179,7 @@ class GuiObject:
 
 
         # Render the button captions
-        font = pygame.font.Font(None, 24)  # You can adjust the font size here
+        font = pygame.font.SysFont("consolas", 20)  # You can adjust the font size here
         button1_text = font.render(self.button1_caption, True, (255, 255, 255))
         button2_text = font.render(self.button2_caption, True, (255, 255, 255))
 
@@ -143,11 +193,11 @@ class GuiObject:
 
         # Render the text fields
         #Bat
-        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_bat_rect)
+        pygame.draw.rect(self.window, (192, 192, 192), self.text_field_bat_rect)
         bat_color = (0, 150, 0)
         if data_for_osd["current_state"]["bat"] < 30:
             bat_color = (150,0,0)
-        text_surface_bat = self.font.render("Bat: " +str(data_for_osd["current_state"]["bat"]) + "%", True, bat_color)
+        text_surface_bat = self.font.render("Battery: " + str(data_for_osd["current_state"]["bat"]) + "%", True, bat_color)
         self.window.blit(text_surface_bat, (self.text_field_bat_rect.x + 5, self.text_field_bat_rect.y + 5))
         #Position
         if "position" in data_for_osd:
@@ -158,28 +208,53 @@ class GuiObject:
             pos_x = "Na"
             pos_y = "Na"
             pos_z = "Na"
-        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_pos_rect)
-        pos_color = (0, 150, 0)
-        text_surface_pos = self.font.render("relative_position [cm]:   X: " + pos_x + "   Y: " + pos_y + "   Z: " + pos_z, True, pos_color)
+        pygame.draw.rect(self.window, (192, 192, 192), self.text_field_pos_rect)
+        pos_color = (0, 0, 0)
+        text_surface_pos = self.font.render("position: X: " + pos_x + " |Y: " + pos_y + "  |Z: " + pos_z, True, pos_color)
         self.window.blit(text_surface_pos, (self.text_field_pos_rect.x + 5, self.text_field_pos_rect.y + 5))
         #Status
-        status_color = (0, 150, 0)
+        status_color = (0, 0, 0)
         if self.flight_mode == "Manual":
             status_msg = "Switch to Auto to search area in front of drone"
         elif self.flight_mode == "Auto" and not "SPACE" in data_for_osd["keys_pressed"]:
             status_msg = "Hold SPACE to search Area"
         elif self.flight_mode == "Auto" and "SPACE" in data_for_osd["keys_pressed"] and data_for_osd["person_cords"] is None:
             number_of_waypoints = len(data_for_osd["waypoints"])
-            status_msg = "Searching...Waypoint "+ ", distance to waypoint " + str(data_for_osd["waypoint_index"]+1)+\
+            status_msg = "Searching,"+ " distance to Waypoint " + str(data_for_osd["waypoint_index"]+1)+\
                          "/"+ str(number_of_waypoints) +": "+ str(round(data_for_osd["mag_to_waypoint"],1))
         elif self.flight_mode == "Auto" and "SPACE" in data_for_osd["keys_pressed"] and data_for_osd["person_cords"] is not None:
             status_msg = "Person found"
             status_color = (150, 0, 0)
         else:
             status_msg = "Unexpected Status"
-        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_status_rect)
+        pygame.draw.rect(self.window, (192, 192, 192), self.text_field_status_rect)
         text_surface_status = self.font.render(status_msg, True, status_color)
         self.window.blit(text_surface_status, (self.text_field_status_rect.x + 5, self.text_field_status_rect.y + 5))
+
+        #Render the input Box
+        pygame.draw.rect(self.window, (192,192,192), pygame.Rect(self.image_width+50, 145, 320, 160))
+
+
+        # Render the input names
+        self.window.blit(self.search_area_name, (self.image_width+50, 150))
+        self.window.blit(self.depth_name, (self.image_width+50, 200))
+        self.window.blit(self.height_name, (self.image_width+50, 250))
+
+        # Draw the input boxes
+        pygame.draw.rect(self.window, (255, 255, 255), self.depth_rect)
+        pygame.draw.rect(self.window, (255, 255, 255), self.height_rect)
+
+        # Render the input text
+        depth_box = self.font.render(self.depth_text, True, (0, 0, 0))
+        height_box = self.font.render(self.height_text, True, (0, 0, 0))
+        self.window.blit(depth_box, (self.depth_rect.x + 5, self.depth_rect.y + 5))
+        self.window.blit(height_box, (self.height_rect.x + 5, self.height_rect.y + 5))
+
+        # Highlight the selected input box
+        if self.selected_input == "depth":
+            pygame.draw.rect(self.window, (0, 0, 255), self.depth_rect, 2)
+        elif self.selected_input == "height":
+            pygame.draw.rect(self.window, (0, 0, 255), self.height_rect, 2)
 
 
         # Update the display
