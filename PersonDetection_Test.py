@@ -1,5 +1,4 @@
 from djitellopy import tello
-import KeyPressModule as kp
 from time import sleep
 from PersonDetector import PersonDetectorYoloV7
 import cv2

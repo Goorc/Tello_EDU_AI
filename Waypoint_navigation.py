@@ -3,34 +3,31 @@ import math
 import numpy as np
 class Waypoint_navigation:
 
-    position = {} #the position of the drone relative to the point where the self.__init__() is called
-    start_time = 0
+    position = {} #the position of the drone in the world coordinate system. The origin is where self.__init()__ is called. positive X-Axis is in forward direction, positive Y-Axis is to the right of the drone at the time of turning the drone on (not the the initialisation of this class)
     previous_state = {} # the state of the drone in the previous calculation of the position of the drone
-    search_area = {"width": 0, "depth": 0}
-    view_distance = 9  # determines how far the drone can recognize a human, mainly influences the granularity of the search pattern
+    search_parameters = {"width": 0, "depth": 0, "distance": 9} #width and depth of the square which is search and distance between the lines of the searchpattern
     # the max and min absolute value of the control inputs of the corrosponting controlaxis
     # max is needed to avoid overshoot, min is needed because otherwise the drone does not register a movement and the position won't be updated
     control_input_range = {"maxlr": 60, "minlr": 20, "maxfb": 60 , "minfb":20, "maxud":100, "minud":0, "maxyv":100, "minyv":0}
-    relative_waypoints = []  # List of dictionaries of the relative_waypoints in the Auto_search
-    waypoints = []
+    relative_waypoints = []  # List of dictionaries of the relative_waypoints in the coordinate system of the drone
+    waypoints = [] # List of dictionaries of the waypoints in the world coordinate system
     nextWaypointIndex = 0   # Indicates which waypoint is the next to be reached in  Auto_search()
     navigator_active = False  # is used as a status indicator to whether the automatic search is active or not
 
-    def __init__(self, current_state, search_area_width=30, search_area_depth=30):
+    def __init__(self, current_state, search_area_width=10, search_area_depth=10):
         self.previous_state = current_state
         self.position = {"x": 0, "y": 0, "z": 0, "yaw": current_state["yaw"], "time": time.time()}
-        self.start_time = time.time()
-        self.search_area = {"width": search_area_width, "depth": search_area_depth}
-        self.yaw_at_start = current_state["yaw"]
+        self.search_parameters["width"] = search_area_width
+        self.search_parameters["depth"] = search_area_depth
         # Calculating relative waypoints in the coordinate system of the drone, z not needed since Tello maintains height
         i_x = 0
-        while i_x*self.view_distance < self.search_area["depth"]:
+        while i_x*self.search_parameters["distance"] < self.search_parameters["depth"]:
             if (i_x % 2) == 0:
-                self.relative_waypoints.append({"y": 0, "x": i_x*self.view_distance})
-                self.relative_waypoints.append({"y": self.search_area["width"], "x": i_x*self.view_distance})
+                self.relative_waypoints.append({"y": 0, "x": i_x*self.search_parameters["distance"]})
+                self.relative_waypoints.append({"y": self.search_parameters["width"], "x": i_x*self.search_parameters["distance"]})
             else:
-                self.relative_waypoints.append({"y": self.search_area["width"], "x": i_x*self.view_distance})
-                self.relative_waypoints.append({"y": 0, "x": i_x*self.view_distance})
+                self.relative_waypoints.append({"y": self.search_parameters["width"], "x": i_x*self.search_parameters["distance"]})
+                self.relative_waypoints.append({"y": 0, "x": i_x*self.search_parameters["distance"]})
             i_x = i_x+1
         self.relative_waypoints.append({"y": 0, "x": 0})  # Last Waypoint will always be point of mission Start
 
@@ -55,40 +52,44 @@ class Waypoint_navigation:
         lr, fb, ud, yv = 0, 0, 0, 0
         self.update_position(current_state)
 
-        distance_to_waypoint = math.sqrt((self.waypoints[self.nextWaypointIndex]["y"]-self.position["y"])**2 +
-                                (self.waypoints[self.nextWaypointIndex]["x"]-self.position["x"])**2)
-
         vec_to_waypoint = np.array([self.waypoints[self.nextWaypointIndex]["x"]-self.position["x"],
                                     self.waypoints[self.nextWaypointIndex]["y"]-self.position["y"]])
+        mag_to_waypoint = np.linalg.norm(vec_to_waypoint)
         #print("next_waypoint" +str(self.waypoints[self.nextWaypointIndex])+ "  index:" + str(self.nextWaypointIndex))
         #print("vec_to_waypoint: "+ str(vec_to_waypoint))
 
-        if distance_to_waypoint != 0:
+        if mag_to_waypoint != 0:
             #  calculating the angle between vec_to_waypoint and the vector [0,1] to get the angle to be rotated
             #print("yaw: "+str(current_state["yaw"]))
             vec_forward = np.array([1,0])
             dot_product = np.dot(vec_to_waypoint, vec_forward)
-            mag_to_waypoint = np.linalg.norm(vec_to_waypoint)
             mag_forward = np.linalg.norm(vec_forward)
             cosine_angle = dot_product / (mag_to_waypoint * mag_forward)
-            angle = np.degrees(np.arccos(cosine_angle))
-            #print("angle: "+str(angle))
+            yaw_setpoint = np.degrees(np.arccos(cosine_angle))
 
-            # if vec_to_waypoint points into left half plane angle is supposed to be negative
-            if vec_to_waypoint[1] < 0:
-                angle = -angle
+            #setpoint has to be negative if vec to waypoint points into left halfplane
+            if vec_to_waypoint[1]<0:
+                yaw_setpoint = -yaw_setpoint
 
+            yaw_measured = current_state["yaw"]
+            #print("yaw_setpoint: " + str(yaw_setpoint))
             #  value positive if drone has to rotate clockwise negative if counterclockwise rotation is needed to correct
-            yaw_error = angle - current_state["yaw"]
+            yaw_error = yaw_setpoint - yaw_measured
+
+            if yaw_error > 180:
+                yaw_error -= 360
+            elif yaw_error < -180:
+                yaw_error += 360
+
             #print("yaw_error: "+ str(yaw_error))
             yaw_error_normalized = yaw_error/180
 
             # P controller always aligning the Drone so it looks at the next waypoint
             max_yv = 100
-            yv = int(yaw_error_normalized * max_yv * 5)
+            yv = int(yaw_error_normalized * max_yv*3 )
 
             #Case1: yaw error to big, either because of new waypoint or because of outside disturbance
-            if abs(yaw_error) > 5:
+            if abs(yaw_error_normalized) > 0.05:
                 lr, fb, ud = 0, 0, 0
             #Case2: P controller to fly towards the next waypoint by flying forward
             else:
@@ -98,14 +99,21 @@ class Waypoint_navigation:
                 elif 0 < abs(fb) < self.control_input_range["minfb"]:
                     fb = int(fb / abs(fb) * self.control_input_range["minfb"])
 
+            #print("\n ----------------")
+            #print("next_waypoint: "+str(self.waypoints[self.nextWaypointIndex])+ "index: "+str(self.nextWaypointIndex))
+            #print("position: "+str(self.position))
+            #print("mag_to_waypoint:" + str(mag_to_waypoint))
+            #print("yaw_setpoint: "+ str(yaw_setpoint))
+            #print("yaw_error: "+str(yaw_error))
+            #print("----------------\n")
         # Detecting if waypoint is reached
-        if distance_to_waypoint < 3:
+        if mag_to_waypoint < 3:
             self.nextWaypointIndex = self.nextWaypointIndex + 1
             if self.nextWaypointIndex > len(self.waypoints)-1:  # Stay at last waypoint if it is reached
                 self.nextWaypointIndex = self.nextWaypointIndex - 1
                 lr, fb, ud, yv = 0, 0, 0, 0
         rc_control = lr, fb, ud, yv
-        print("rc_control"+ str(rc_control))
+        #print("rc_control"+ str(rc_control))
         return rc_control
 
 
@@ -120,8 +128,8 @@ class Waypoint_navigation:
             x_new = point_zero["x"] + math.cos(yaw)*rwp["x"] + -math.sin(yaw)*rwp["y"]
             y_new = point_zero["y"] + math.sin(yaw)*rwp["x"] + math.cos(yaw)*rwp["y"]
             self.waypoints.append({"x":x_new,"y":y_new})
-        print("current position:" + str(self.position))
-        print("calculated Waypoints:"+ str(self.waypoints))
+        #print("current position:" + str(self.position))
+        #print("calculated Waypoints:"+ str(self.waypoints))
 
 
 if __name__ == '__main__':

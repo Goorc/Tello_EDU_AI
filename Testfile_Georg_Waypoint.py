@@ -23,7 +23,7 @@ def Yaw_follow(data):
     # generate steering commands based on the position of the object
     yv = int(x_offset / (0.5 * data["img_width"]) * max_yv)
     rc_control = lr, fb, ud, yv
-    print("Yaw_Follow:", rc_control)
+    #print("Yaw_Follow:", rc_control)
     return rc_control
 
 
@@ -68,7 +68,7 @@ def person_tracker(image):
 #converts he pressed keys into control commands which can be sent to tello
 def keyboard2control(keys_pressed):
     lr, fb, ud, yv = 0, 0, 0, 0
-    speed = 30 #range -100 to 100. Negative values invert the controls
+    speed = 70 #range -100 to 100. Negative values invert the controls
 
     if "DOWN" in keys_pressed:
         fb = -speed
@@ -119,8 +119,11 @@ while True:
             waypoint_navigator.calculateWaypoints()
             waypoint_navigator.navigator_active = True
         if "SPACE" in keys_pressed: #if flight mode is Auto Space as dead man switch is pressed drone follows Waypoints
-            obj_cords = person_tracker(img)
             rc_control = waypoint_navigator.navigate(me.get_current_state())
+            person_cords = person_tracker(img)
+            print(person_cords)
+            if person_cords is not None:
+                rc_control = Yaw_follow(person_cords)
             #print("Yaw: " + str(me.get_yaw()))
             #print(waypoint_navigator.position)
             #print(rc_control)
