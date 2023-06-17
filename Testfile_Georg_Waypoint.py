@@ -63,18 +63,6 @@ def person_tracker(image):
     trackpoint = person_detector.detect(image)
     return trackpoint
 
-def drawTrackPointOnImg(img, trackedPoint):
-    if (trackedPoint is None):
-        return img
-    else:
-        # draw crosshair
-        # black = np.zeros((480,640,3), np.uint8)
-        cv2.line(img, (trackedPoint["x"] - 10, trackedPoint["y"]),
-                (trackedPoint["x"] + 10, trackedPoint["y"]), (0, 255, 0), thickness=2)
-        cv2.line(img, (trackedPoint["x"], trackedPoint["y"] - 10),
-                (trackedPoint["x"], trackedPoint["y"] + 10), (0, 255, 0), thickness=2)
-        return img
-
 #converts he pressed keys into control commands which can be sent to tello
 def keyboard2control(keys_pressed):
     lr, fb, ud, yv = 0, 0, 0, 0
@@ -112,12 +100,12 @@ gui = GUI.GuiObject()
 waypoint_navigator = Waypoint_navigation.Waypoint_navigation(me.get_current_state())
 me.streamon()
 rc_control = [0, 0, 0, 0]
-gui.draw(me.get_frame_read().frame, me.get_current_state(), waypoint_navigator.position)
+#gui.draw(me.get_frame_read().frame, me.get_current_state(), waypoint_navigator.position)
 person_detector = PersonDetectorYoloV7()
 print(me.get_current_state())
 while True:
     img = me.get_frame_read().frame
-
+    person_cords = None
     #Registering Keyboard Inputs
     keys_pressed = gui.getKeyboardInput()
     #Converting keyboard inputs into control commands for Tello
@@ -134,7 +122,6 @@ while True:
             print(person_cords)
             if person_cords is not None:
                 rc_control = Yaw_follow(person_cords)
-                img = drawTrackPointOnImg(img, person_cords)
             #print("Yaw: " + str(me.get_yaw()))
             #print(waypoint_navigator.position)
             #print(rc_control)
@@ -145,5 +132,9 @@ while True:
     sleep(0.05)
 
     #drawing the Gui including camera feed
-    gui.draw(img, me.get_current_state(), waypoint_navigator.position)
-    #print("Yaw: "+str(me.get_yaw()))
+    data_for_osd = {"current_state": me.get_current_state(),
+                    "person_cords": person_cords, "position": waypoint_navigator.position,
+                    "mag_to_waypoint": waypoint_navigator.mag_to_waypoint, "waypoints": waypoint_navigator.waypoints,
+                    "waypoint_index": waypoint_navigator.waypoint_index,
+                    "keys_pressed": keys_pressed}
+    gui.draw(img, data_for_osd)

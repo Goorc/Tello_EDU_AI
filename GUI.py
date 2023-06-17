@@ -15,7 +15,7 @@ class GuiObject:
         self.window_width = 640
         self.window_height = 480
         self.window = pygame.display.set_mode((self.window_width, self.window_height))
-        pygame.display.set_caption("Pygame Window")
+        pygame.display.set_caption("Tello_EDU_AI GUI")
 
         # Button setup
         self.button_width = 100
@@ -43,6 +43,9 @@ class GuiObject:
 
         self.text_field_pos_rect = pygame.Rect(50, 15, 350, 30)
         self.text_field_pos_text = ""
+
+        self.text_field_status_rect = pygame.Rect(50, self.window_height-120, 450, 30)
+        self.text_field_status_text = ""
     def getKeyboardInput(self):
         keys_pressed = []
         if self.getKey("LEFT"):
@@ -81,7 +84,7 @@ class GuiObject:
         return ans
 
     # Run the main game loop
-    def draw(self, img, current_state,relative_position= None):
+    def draw(self, img, data_for_osd):
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
@@ -91,6 +94,12 @@ class GuiObject:
                     self.flight_mode = "Manual"
                 elif self.button2_rect.collidepoint(mouse_pos):
                     self.flight_mode = "Auto"
+
+        #drawing tracking point on img
+        if "person_cords" in data_for_osd:
+            if data_for_osd["person_cords"] is not None:
+                midpoint = (data_for_osd["person_cords"]["x"], data_for_osd["person_cords"]["y"])
+                cv2.circle(img, midpoint, 10, (0 , 0, 150), 2)
 
         # Transpose and flip the image to correct the rotation
         img = cv2.transpose(img)
@@ -136,31 +145,43 @@ class GuiObject:
         #Bat
         pygame.draw.rect(self.window, (0, 0, 0), self.text_field_bat_rect)
         bat_color = (0, 150, 0)
-        if current_state["bat"] < 30:
+        if data_for_osd["current_state"]["bat"] < 30:
             bat_color = (150,0,0)
-        text_surface_bat = self.font.render("Bat: " +str(current_state["bat"]) + "%", True, bat_color)
+        text_surface_bat = self.font.render("Bat: " +str(data_for_osd["current_state"]["bat"]) + "%", True, bat_color)
         self.window.blit(text_surface_bat, (self.text_field_bat_rect.x + 5, self.text_field_bat_rect.y + 5))
         #Position
-        if relative_position is not None:
-            pos_x = str(round(relative_position["x"], 1))
-            pos_y = str(round(relative_position["y"], 1))
-            pos_z = str(round(relative_position["z"], 1))
+        if "position" in data_for_osd:
+            pos_x = str(round(data_for_osd["position"]["x"], 1))
+            pos_y = str(round(data_for_osd["position"]["y"], 1))
+            pos_z = str(round(data_for_osd["position"]["z"], 1))
         else:
             pos_x = "Na"
             pos_y = "Na"
             pos_z = "Na"
-
         pygame.draw.rect(self.window, (0, 0, 0), self.text_field_pos_rect)
         pos_color = (0, 150, 0)
-        text_surface_pos = self.font.render("relative_position [cm]:   X: " + pos_x + "   Y: " + pos_y + "   Z: " + pos_z, True, bat_color)
+        text_surface_pos = self.font.render("relative_position [cm]:   X: " + pos_x + "   Y: " + pos_y + "   Z: " + pos_z, True, pos_color)
         self.window.blit(text_surface_pos, (self.text_field_pos_rect.x + 5, self.text_field_pos_rect.y + 5))
+        #Status
+        status_color = (0, 150, 0)
+        if self.flight_mode == "Manual":
+            status_msg = "Switch to Auto to search area in front of drone"
+        elif self.flight_mode == "Auto" and not "SPACE" in data_for_osd["keys_pressed"]:
+            status_msg = "Hold SPACE to search Area"
+        elif self.flight_mode == "Auto" and "SPACE" in data_for_osd["keys_pressed"] and data_for_osd["person_cords"] is None:
+            number_of_waypoints = len(data_for_osd["waypoints"])
+            status_msg = "Searching...Waypoint "+ ", distance to waypoint " + str(data_for_osd["waypoint_index"]+1)+\
+                         "/"+ str(number_of_waypoints) +": "+ str(round(data_for_osd["mag_to_waypoint"],1))
+        elif self.flight_mode == "Auto" and "SPACE" in data_for_osd["keys_pressed"] and data_for_osd["person_cords"] is not None:
+            status_msg = "Person found"
+            status_color = (150, 0, 0)
+        else:
+            status_msg = "Unexpected Status"
+        pygame.draw.rect(self.window, (0, 0, 0), self.text_field_status_rect)
+        text_surface_status = self.font.render(status_msg, True, status_color)
+        self.window.blit(text_surface_status, (self.text_field_status_rect.x + 5, self.text_field_status_rect.y + 5))
+
 
         # Update the display
         pygame.display.update()
-
-    def overlay(self,img, x, y):
-        # Draw a red cross at the specified coordinates
-        cv2.line(img, (x - 10, y), (x + 10, y), (0, 0, 255), 2)
-        cv2.line(img, (x, y - 10), (x, y + 10), (0, 0, 255), 2)
-
 

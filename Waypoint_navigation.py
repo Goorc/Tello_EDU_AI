@@ -11,24 +11,31 @@ class Waypoint_navigation:
     control_input_range = {"maxlr": 60, "minlr": 20, "maxfb": 60 , "minfb":20, "maxud":100, "minud":0, "maxyv":100, "minyv":0}
     relative_waypoints = []  # List of dictionaries of the relative_waypoints in the coordinate system of the drone
     waypoints = [] # List of dictionaries of the waypoints in the world coordinate system
-    nextWaypointIndex = 0   # Indicates which waypoint is the next to be reached in  Auto_search()
+    waypoint_index = 0   # Indicates which waypoint is the next to be reached in  navigate()
     navigator_active = False  # is used as a status indicator to whether the automatic search is active or not
+    mag_to_waypoint = 0
 
     def __init__(self, current_state, search_area_width=10, search_area_depth=10):
         self.previous_state = current_state
         self.position = {"x": 0, "y": 0, "z": 0, "yaw": current_state["yaw"], "time": time.time()}
+        self.calculate_relative_Waypoints(search_area_width,search_area_depth)
+
+
+    def calculate_relative_Waypoints (self, search_area_width = 10, search_area_depth=10):
+        # Calculating relative waypoints in the coordinate system of the drone, z not needed since Tello maintains height
         self.search_parameters["width"] = search_area_width
         self.search_parameters["depth"] = search_area_depth
-        # Calculating relative waypoints in the coordinate system of the drone, z not needed since Tello maintains height
         i_x = 0
-        while i_x*self.search_parameters["distance"] < self.search_parameters["depth"]:
+        while i_x * self.search_parameters["distance"] < self.search_parameters["depth"]:
             if (i_x % 2) == 0:
-                self.relative_waypoints.append({"y": 0, "x": i_x*self.search_parameters["distance"]})
-                self.relative_waypoints.append({"y": self.search_parameters["width"], "x": i_x*self.search_parameters["distance"]})
+                self.relative_waypoints.append({"y": 0, "x": i_x * self.search_parameters["distance"]})
+                self.relative_waypoints.append(
+                    {"y": self.search_parameters["width"], "x": i_x * self.search_parameters["distance"]})
             else:
-                self.relative_waypoints.append({"y": self.search_parameters["width"], "x": i_x*self.search_parameters["distance"]})
-                self.relative_waypoints.append({"y": 0, "x": i_x*self.search_parameters["distance"]})
-            i_x = i_x+1
+                self.relative_waypoints.append(
+                    {"y": self.search_parameters["width"], "x": i_x * self.search_parameters["distance"]})
+                self.relative_waypoints.append({"y": 0, "x": i_x * self.search_parameters["distance"]})
+            i_x = i_x + 1
         self.relative_waypoints.append({"y": 0, "x": 0})  # Last Waypoint will always be point of mission Start
 
     # Tracks the relative position of the drone in relation to the position of the initialization of the Object
@@ -52,19 +59,19 @@ class Waypoint_navigation:
         lr, fb, ud, yv = 0, 0, 0, 0
         self.update_position(current_state)
 
-        vec_to_waypoint = np.array([self.waypoints[self.nextWaypointIndex]["x"]-self.position["x"],
-                                    self.waypoints[self.nextWaypointIndex]["y"]-self.position["y"]])
-        mag_to_waypoint = np.linalg.norm(vec_to_waypoint)
-        #print("next_waypoint" +str(self.waypoints[self.nextWaypointIndex])+ "  index:" + str(self.nextWaypointIndex))
+        vec_to_waypoint = np.array([self.waypoints[self.waypoint_index]["x"]-self.position["x"],
+                                    self.waypoints[self.waypoint_index]["y"]-self.position["y"]])
+        self.mag_to_waypoint = np.linalg.norm(vec_to_waypoint)
+        #print("next_waypoint" +str(self.waypoints[self.waypoint_index])+ "  index:" + str(self.waypoint_index))
         #print("vec_to_waypoint: "+ str(vec_to_waypoint))
 
-        if mag_to_waypoint != 0:
+        if self.mag_to_waypoint != 0:
             #  calculating the angle between vec_to_waypoint and the vector [0,1] to get the angle to be rotated
             #print("yaw: "+str(current_state["yaw"]))
             vec_forward = np.array([1,0])
             dot_product = np.dot(vec_to_waypoint, vec_forward)
             mag_forward = np.linalg.norm(vec_forward)
-            cosine_angle = dot_product / (mag_to_waypoint * mag_forward)
+            cosine_angle = dot_product / (self.mag_to_waypoint * mag_forward)
             yaw_setpoint = np.degrees(np.arccos(cosine_angle))
 
             #setpoint has to be negative if vec to waypoint points into left halfplane
@@ -84,7 +91,7 @@ class Waypoint_navigation:
             #print("yaw_error: "+ str(yaw_error))
             yaw_error_normalized = yaw_error/180
 
-            # P controller always aligning the Drone so it looks at the next waypoint
+            # P controller always aligning the Drone, so it looks at the next waypoint
             max_yv = 100
             yv = int(yaw_error_normalized * max_yv*3 )
 
@@ -93,33 +100,32 @@ class Waypoint_navigation:
                 lr, fb, ud = 0, 0, 0
             #Case2: P controller to fly towards the next waypoint by flying forward
             else:
-                fb = int(5*mag_to_waypoint)
+                fb = int(5*self.mag_to_waypoint)
                 if abs(fb) > self.control_input_range["maxfb"]:
                     fb = int(fb / abs(fb) * self.control_input_range["maxfb"])
                 elif 0 < abs(fb) < self.control_input_range["minfb"]:
                     fb = int(fb / abs(fb) * self.control_input_range["minfb"])
 
             #print("\n ----------------")
-            #print("next_waypoint: "+str(self.waypoints[self.nextWaypointIndex])+ "index: "+str(self.nextWaypointIndex))
+            #print("next_waypoint: "+str(self.waypoints[self.waypoint_index])+ "index: "+str(self.waypoint_index))
             #print("position: "+str(self.position))
-            #print("mag_to_waypoint:" + str(mag_to_waypoint))
+            #print("self.mag_to_waypoint:" + str(self.mag_to_waypoint))
             #print("yaw_setpoint: "+ str(yaw_setpoint))
             #print("yaw_error: "+str(yaw_error))
             #print("----------------\n")
         # Detecting if waypoint is reached
-        if mag_to_waypoint < 3:
-            self.nextWaypointIndex = self.nextWaypointIndex + 1
-            if self.nextWaypointIndex > len(self.waypoints)-1:  # Stay at last waypoint if it is reached
-                self.nextWaypointIndex = self.nextWaypointIndex - 1
+        if self.mag_to_waypoint < 3:
+            self.waypoint_index = self.waypoint_index + 1
+            if self.waypoint_index > len(self.waypoints)-1:  # Stay at last waypoint if it is reached
+                self.waypoint_index = self.waypoint_index - 1
                 lr, fb, ud, yv = 0, 0, 0, 0
         rc_control = lr, fb, ud, yv
         #print("rc_control"+ str(rc_control))
         return rc_control
 
-
     def calculateWaypoints(self):
         #this function transforms the relative waypoints into absolute waypoints. position is used as coordination system
-        self.nextWaypointIndex = 0
+        self.waypoint_index = 0
         self.waypoints = []
         point_zero = self.position
         yaw = math.radians(point_zero["yaw"])
