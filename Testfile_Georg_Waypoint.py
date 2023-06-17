@@ -26,7 +26,6 @@ def Yaw_follow(data):
     #print("Yaw_Follow:", rc_control)
     return rc_control
 
-
 #returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of a person tracker
 def green_tracker(image):
     # Convert the image to HSV color space
@@ -60,10 +59,21 @@ def green_tracker(image):
     else:
         return None
 
-
 def person_tracker(image):
     trackpoint = person_detector.detect(image)
     return trackpoint
+
+def drawTrackPointOnImg(img, trackedPoint):
+    if (trackedPoint is None):
+        return img
+    else:
+        # draw crosshair
+        # black = np.zeros((480,640,3), np.uint8)
+        cv2.line(img, (trackedPoint["x"] - 10, trackedPoint["y"]),
+                (trackedPoint["x"] + 10, trackedPoint["y"]), (0, 255, 0), thickness=2)
+        cv2.line(img, (trackedPoint["x"], trackedPoint["y"] - 10),
+                (trackedPoint["x"], trackedPoint["y"] + 10), (0, 255, 0), thickness=2)
+        return img
 
 #converts he pressed keys into control commands which can be sent to tello
 def keyboard2control(keys_pressed):
@@ -124,12 +134,12 @@ while True:
             print(person_cords)
             if person_cords is not None:
                 rc_control = Yaw_follow(person_cords)
+                img = drawTrackPointOnImg(img, person_cords)
             #print("Yaw: " + str(me.get_yaw()))
             #print(waypoint_navigator.position)
             #print(rc_control)
     else:  # Flight mode is Manual
         waypoint_navigator.navigator_active = False
-
     #Sending rc controls either set by keyboard input or Algorithm to drone
     me.send_rc_control(rc_control[0], rc_control[1], rc_control[2], rc_control[3])
     sleep(0.05)
