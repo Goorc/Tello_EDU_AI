@@ -7,6 +7,7 @@ import numpy as np
 class GuiObject:
 
     flight_mode = "Manual"
+    prev_flight_mode = ""
     def __init__(self):
         # Initialize Pygame
         pygame.init()
@@ -81,12 +82,6 @@ class GuiObject:
         self.waypoint_mag_rect = pygame.Rect(self.text_input_position["x"], self.text_input_position["y"]+110, 0, 30)
         self.waypoint_mag_text = ""
 
-    def is_integer(self,string):
-        try:
-            int(string)
-            return True
-        except ValueError:
-            return False
     def getKeyboardInput(self):
         keys_pressed = []
         if self.getKey("LEFT"):
@@ -132,18 +127,7 @@ class GuiObject:
             if event.type == QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    if self.depth_text == "":
-                        self.depth_text = "10"
-                    if self.width_text == "":
-                        self.width_text = "10"
-                    if self.is_integer(self.depth_text) and self.is_integer(self.width_text):
-                        print("Depth:", self.depth_text)  # Replace with your desired logic
-                        print("Width:", self.width_text)  # Replace with your desired logic
-                    else:
-                        print("Invalid input")
-                    self.selected_input = None
-                elif event.key == pygame.K_BACKSPACE:
+                if event.key == pygame.K_BACKSPACE:
                     if self.selected_input == "width":
                         self.width_text = self.width_text[:-1]
                     else:
@@ -165,6 +149,15 @@ class GuiObject:
                     self.selected_input = "depth"
                 elif self.width_rect.collidepoint(mouse_pos):
                     self.selected_input = "width"
+            elif self.prev_flight_mode == "Manual" and self.flight_mode == "Auto":
+                # save input values if fligth_mode switches to Auto
+                if self.depth_text == "":
+                    self.depth_text = "10"
+                if self.width_text == "":
+                    self.width_text = "10"
+                print("Depth:", self.depth_text)  # Replace with your desired logic
+                print("Width:", self.width_text)  # Replace with your desired logic
+                self.selected_input = None
         # Gray background for the window
         self.window.fill((220, 220, 220))
 
@@ -306,6 +299,6 @@ class GuiObject:
                              (self.waypoint_mag_rect.x + 5, self.waypoint_mag_rect.y + 5))
 
 
-
+        self.prev_flight_mode = self.flight_mode
         # Update the display
         pygame.display.update()
