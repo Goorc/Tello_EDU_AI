@@ -44,19 +44,28 @@ class GuiObject:
         # Text field setup
         self.text_field_pos_rect = pygame.Rect(self.image_width+50, 15, 500, 30)
         self.text_field_pos_text = ""
+        self.text_field_posx_rect = pygame.Rect(self.image_width+50, 45, 500, 30)
+        self.text_field_posx_text = ""
+        self.text_field_posy_rect = pygame.Rect(self.image_width+200, 45, 0, 30)
+        self.text_field_posy_text = ""
+        self.text_field_posz_rect = pygame.Rect(self.image_width+350, 45, 0, 30)
+        self.text_field_posz_text = ""
 
-        self.text_field_bat_rect = pygame.Rect(self.image_width+50, 60, 180, 30)
+        self.text_field_bat_rect = pygame.Rect(self.image_width+50, 100, 180, 30)
         self.text_field_bat_text = ""
 
         self.text_field_status_rect = pygame.Rect(50, self.window_height-120, 700, 30)
         self.text_field_status_text = ""
 
         # Text input setup
-        self.search_area_name = self.font.render(" Search Area", True, (0, 0, 0))
-        self.depth_name = self.font.render(" Depth:", True, (0, 0, 0))
-        self.height_name = self.font.render(" Height:", True, (0, 0, 0))
-        self.depth_rect = pygame.Rect(self.image_width+160, 200, 200, 40)
-        self.height_rect = pygame.Rect(self.image_width+160, 250, 200, 40)
+        self.text_input_position = {"x": self.image_width+50, "y": 155, "padding": 50}
+        self.search_area_name = self.font.render("Search Area", True, (0, 0, 0))
+        self.depth_name = self.font.render("Depth:", True, (0, 0, 0))
+        self.height_name = self.font.render("Height:", True, (0, 0, 0))
+        self.depth_rect = pygame.Rect(self.text_input_position["x"]+110,
+                                      self.text_input_position["y"]+1*self.text_input_position["padding"], 200, 40)
+        self.height_rect = pygame.Rect(self.text_input_position["x"]+110,
+                                       self.text_input_position["y"]+2*self.text_input_position["padding"], 200, 40)
         self.depth_text = "10"  # Default depth value
         self.height_text = "10"  # Default height value
         self.selected_input = None
@@ -209,9 +218,16 @@ class GuiObject:
             pos_y = "Na"
             pos_z = "Na"
         pygame.draw.rect(self.window, (192, 192, 192), self.text_field_pos_rect)
+        pygame.draw.rect(self.window, (192, 192, 192), self.text_field_posx_rect)
         pos_color = (0, 0, 0)
-        text_surface_pos = self.font.render("position: X: " + pos_x + " |Y: " + pos_y + "  |Z: " + pos_z, True, pos_color)
+        text_surface_pos = self.font.render("position:", True, pos_color)
+        text_surface_posx = self.font.render("X: " + pos_x, True, pos_color)
+        text_surface_posy = self.font.render("Y: " + pos_y, True, pos_color)
+        text_surface_posz = self.font.render("Z: " + pos_z, True, pos_color)
         self.window.blit(text_surface_pos, (self.text_field_pos_rect.x + 5, self.text_field_pos_rect.y + 5))
+        self.window.blit(text_surface_posx, (self.text_field_posx_rect.x + 5, self.text_field_posx_rect.y + 5))
+        self.window.blit(text_surface_posy, (self.text_field_posy_rect.x + 5, self.text_field_posy_rect.y + 5))
+        self.window.blit(text_surface_posz, (self.text_field_posz_rect.x + 5, self.text_field_posz_rect.y + 5))
         #Status
         status_color = (0, 0, 0)
         if self.flight_mode == "Manual":
@@ -231,32 +247,32 @@ class GuiObject:
         text_surface_status = self.font.render(status_msg, True, status_color)
         self.window.blit(text_surface_status, (self.text_field_status_rect.x + 5, self.text_field_status_rect.y + 5))
 
-        #Render the input Box
-        pygame.draw.rect(self.window, (192,192,192), pygame.Rect(self.image_width+50, 145, 320, 160))
+        if self.flight_mode == "Manual":
+            #Render the input Box
+            pygame.draw.rect(self.window, (192,192,192), pygame.Rect(self.text_input_position["x"], self.text_input_position["y"], 500, 160))
 
 
-        # Render the input names
-        self.window.blit(self.search_area_name, (self.image_width+50, 150))
-        self.window.blit(self.depth_name, (self.image_width+50, 200))
-        self.window.blit(self.height_name, (self.image_width+50, 250))
+            # Render the input names
+            self.window.blit(self.search_area_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+5))
+            self.window.blit(self.depth_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+1*self.text_input_position["padding"]))
+            self.window.blit(self.height_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+2*self.text_input_position["padding"]))
 
-        # Draw the input boxes
-        pygame.draw.rect(self.window, (255, 255, 255), self.depth_rect)
-        pygame.draw.rect(self.window, (255, 255, 255), self.height_rect)
+            # Draw the input boxes
+            pygame.draw.rect(self.window, (255, 255, 255), self.depth_rect)
+            pygame.draw.rect(self.window, (255, 255, 255), self.height_rect)
 
-        # Render the input text
-        depth_box = self.font.render(self.depth_text, True, (0, 0, 0))
-        height_box = self.font.render(self.height_text, True, (0, 0, 0))
-        self.window.blit(depth_box, (self.depth_rect.x + 5, self.depth_rect.y + 5))
-        self.window.blit(height_box, (self.height_rect.x + 5, self.height_rect.y + 5))
+            # Render the input text
+            depth_box = self.font.render(self.depth_text, True, (0, 0, 0))
+            height_box = self.font.render(self.height_text, True, (0, 0, 0))
+            self.window.blit(depth_box, (self.depth_rect.x + 5, self.depth_rect.y + 5))
+            self.window.blit(height_box, (self.height_rect.x + 5, self.height_rect.y + 5))
 
-        # Highlight the selected input box
-        if self.selected_input == "depth":
-            pygame.draw.rect(self.window, (0, 0, 255), self.depth_rect, 2)
-        elif self.selected_input == "height":
-            pygame.draw.rect(self.window, (0, 0, 255), self.height_rect, 2)
+            # Highlight the selected input box
+            if self.selected_input == "depth":
+                pygame.draw.rect(self.window, (0, 0, 255), self.depth_rect, 2)
+            elif self.selected_input == "height":
+                pygame.draw.rect(self.window, (0, 0, 255), self.height_rect, 2)
 
 
         # Update the display
         pygame.display.update()
-
