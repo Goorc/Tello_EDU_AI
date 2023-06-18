@@ -5,8 +5,7 @@ from pygame.locals import *
 
 class GuiObject:
     """
-        The GuiObject class provides functionality for creating and managing a Pygame-based graphical user interface (GUI).
-        It handles user inputs, such as button clicks and keyboard events, and displays information on the OSD.
+        The GuiObject class provides functionality for creating and managing a Pygame-based graphical user interface (GUI). It handles user inputs, such as button clicks and keyboard events, and displays information on the OSD.
 
         :param self.flight_mode: The current flight mode (default: "Manual").
         :param self.prev_flight_mode: The flight_mode in the previous call of self.draw().

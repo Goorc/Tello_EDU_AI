@@ -5,16 +5,12 @@ import numpy as np
 
 class WaypointNavigation:
     """
-    This Class handles the tracking of the current position, as well as the calculation of the waypoints and the
-    navigation of the drone to follow them.
+    This Class handles the tracking of the current position, as well as the calculation of the waypoints and the navigation of the drone to follow them.
 
-    :param self.position: Position of the drone in the world coordinate system. The origin is where self.__init()__ is
-    called. Positive X-Axis is in forward direction of tello at its boot, positive Y-Axis are to the right
+    :param self.position: Position of the drone in the world coordinate system. The origin is where self.__init()__ is called. Positive X-Axis is in forward direction of tello at its boot, positive Y-Axis are to the right
     :param self.previous_state: The state of the drone from djitellopy at the previous call of self.update_position()
-    :param self.search_parameters: Dictionary with "width" and "depth" of the grid made of the waypoints "distance" is
-    the distance between the flight paths of the grid
-    :param self.control_input_range: Dictionary of max and min absolute values of the control parameters which will be
-    returned. Min needed so tello recognizes the movement
+    :param self.search_parameters: Dictionary with "width" and "depth" of the grid made of the waypoints "distance" is the distance between the flight paths of the grid
+    :param self.control_input_range: Dictionary of max and min absolute values of the control parameters which will be returned. Min needed so tello recognizes the movement
     :param self.relative_Waypoints: List of Dictionaries of the relative_waypoints in the coordinate system of the drone
     :param self.waypoints: List of Dictionaries of the waypoints in the world coordinate system
     :param self.waypoint_index: Indicates which waypoint is the next to be reached in navigate()
@@ -155,15 +151,14 @@ class WaypointNavigation:
 
 class YawFollow:
     """
-    This class makes it possible to keep an object which position is known in the center of the frame by rotating Tello
-    along the Yaw-Axis
+    This class makes it possible to keep an object which position is known in the center of the frame by rotating Tello along the Yaw-Axis
     """
     def navigate(obj_cords):
         """
         This method returns the appropriate rc_control values to keep the object with the known coordinates in the
         center of the frame
-        :param obj_cords: Dictionary of the x, y coordinates of the object as well as the width and height of the image
-        the object has been identified
+
+        :param obj_cords: Dictionary of the x, y coordinates of the object as well as the width and height of the image the object has been identified
         :return: rc_controls which can be sent to Tello
         """
         lr, fb, ud, yv = 0, 0, 0, 0

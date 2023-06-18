@@ -1,3 +1,6 @@
+"""
+The Main module houses the main loop and some additional functions which are needed to control the drone
+"""
 from djitellopy import tello
 from time import sleep
 from PersonDetector import PersonDetectorYoloV7
@@ -11,8 +14,7 @@ logging.getLogger('djitellopy').setLevel(logging.WARNING)  # suppress annoying w
 
 def keyboard_to_control(keys_pressed, control_value = 70):
     """
-    Converts the pressed keys on the keyboard into the corresponding rc controls wich can be sent to tello, also handles
-    takeoff and landing commands
+    Converts the pressed keys on the keyboard into the corresponding rc controls wich can be sent to tello, also handles takeoff and landing commands
 
     :param keys_pressed: List of relevant keys pressed on the computer Keyboard
     :param control_value: value of rc_control if key is pressed range from -100 to 100, negative values to invert

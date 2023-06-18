@@ -1,9 +1,18 @@
 import cv2
 import numpy as np
 
-#returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of a person tracker
+
 class Green_detector:
+    """
+
+    """
     def detect(image):
+        """
+        Returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of the person tracker
+
+        :param image: input image to be analyzed
+        :return: Dictionary with position of tracked object and image size
+        """
         # Convert the image to HSV color space
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
