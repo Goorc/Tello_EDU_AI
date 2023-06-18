@@ -12,18 +12,18 @@ logging.getLogger('djitellopy').setLevel(logging.WARNING)
 
 # gets the coordinates of the recognized object on the picture and returns steering commands appropriate to keep said
 # object in the center of the frame by turning the drone about the yaw axis
-def Yaw_follow(data):
+def Yaw_follow(obj_cords):
     lr, fb, ud, yv = 0, 0, 0, 0
-    # calculate the position of the object relative to the center of the frame
-    frame_center_x, frame_center_y = data["img_width"] // 2, data["img_height"] // 2
-    x_offset = data["x"] - frame_center_x
 
-    max_yv = 70
+    # calculate the position of the object relative to the center of the frame
+    frame_center_x, frame_center_y = obj_cords["img_width"] // 2, obj_cords["img_height"] // 2
+    x_offset = obj_cords["x"] - frame_center_x
 
     # generate steering commands based on the position of the object
-    yv = int(x_offset / (0.5 * data["img_width"]) * max_yv)
+    max_yv = 70
+    yv = int(x_offset / (0.5 * obj_cords["img_width"]) * max_yv)
+
     rc_control = lr, fb, ud, yv
-    #print("Yaw_Follow:", rc_control)
     return rc_control
 
 #returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of a person tracker
@@ -100,39 +100,35 @@ gui = GUI.GuiObject()
 waypoint_navigator = Waypoint_navigation.Waypoint_navigation(me.get_current_state())
 me.streamon()
 rc_control = [0, 0, 0, 0]
-#gui.draw(me.get_frame_read().frame, me.get_current_state(), waypoint_navigator.position)
 person_detector = PersonDetectorYoloV7()
 print(me.get_current_state())
 while True:
     img = me.get_frame_read().frame
     person_cords = None
-    #Registering Keyboard Inputs
+
+    #Registering Keyboard Inputs and converting keyboard inputs into control commands for Tello
     keys_pressed = gui.getKeyboardInput()
-    #Converting keyboard inputs into control commands for Tello
-    #  Default flight mode is Manual for safety reasons, values might get overwritten later in the loop
-    rc_control = keyboard2control(keys_pressed)
+    rc_control = keyboard2control(keys_pressed) # Default flight_mode is Manual
+
     #Updating relative Position of Tello
     waypoint_navigator.update_position(me.get_current_state())
-    if gui.flight_mode == "Auto":  # Flight mode is Auto
+
+    # check if flight_mode is Auto
+    if gui.flight_mode == "Auto":
         if gui.prev_flight_mode == "Manual": #Check if first loop where flight mode is Auto to calculate position of Waypoints in world coordinate system
             search_area_size = gui.get_search_area_size()
             waypoint_navigator.calculate_waypoints(search_area_size["width"],search_area_size["depth"])
         if "SPACE" in keys_pressed: #if flight mode is Auto Space as dead man switch is pressed drone follows Waypoints
             rc_control = waypoint_navigator.navigate(me.get_current_state())
             person_cords = person_tracker(img)
-            #print(person_cords)
             if person_cords is not None:
                 rc_control = Yaw_follow(person_cords)
-            #print("Yaw: " + str(me.get_yaw()))
-            #print(waypoint_navigator.position)
-            #print(rc_control)
 
-
-    #Sending rc controls either set by keyboard input or Algorithm to drone
+    # Sending rc controls either set by keyboard input or Algorithm to drone
     me.send_rc_control(rc_control[0], rc_control[1], rc_control[2], rc_control[3])
     sleep(0.05)
 
-    #drawing the Gui including camera feed
+    # drawing the Gui including camera feed
     data_for_osd = {"current_state": me.get_current_state(),
                     "person_cords": person_cords, "position": waypoint_navigator.position,
                     "mag_to_waypoint": waypoint_navigator.mag_to_waypoint, "waypoints": waypoint_navigator.waypoints,
