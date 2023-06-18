@@ -8,7 +8,7 @@ class Waypoint_navigation:
     search_parameters = {"width": 0, "depth": 0, "distance": 9} #width and depth of the square which is search and distance between the lines of the searchpattern
     # the max and min absolute value of the control inputs of the corrosponting controlaxis
     # max is needed to avoid overshoot, min is needed because otherwise the drone does not register a movement and the position won't be updated
-    control_input_range = {"maxlr": 60, "minlr": 20, "maxfb": 60 , "minfb":20, "maxud":100, "minud":0, "maxyv":100, "minyv":0}
+    control_input_range = {"maxlr": 60, "minlr": 20, "maxfb": 60 , "minfb":20, "maxud":100, "minud":0, "maxyv":70, "minyv":0}
     relative_waypoints = []  # List of dictionaries of the relative_waypoints in the coordinate system of the drone
     waypoints = [] # List of dictionaries of the waypoints in the world coordinate system
     waypoint_index = 0   # Indicates which waypoint is the next to be reached in  navigate()
@@ -18,25 +18,7 @@ class Waypoint_navigation:
     def __init__(self, current_state, search_area_width=10, search_area_depth=10):
         self.previous_state = current_state
         self.position = {"x": 0, "y": 0, "z": 0, "yaw": current_state["yaw"], "time": time.time()}
-        self.calculate_relative_Waypoints(search_area_width,search_area_depth)
-
-
-    def calculate_relative_Waypoints (self, search_area_width = 10, search_area_depth=10):
-        # Calculating relative waypoints in the coordinate system of the drone, z not needed since Tello maintains height
-        self.search_parameters["width"] = search_area_width
-        self.search_parameters["depth"] = search_area_depth
-        i_x = 0
-        while i_x * self.search_parameters["distance"] < self.search_parameters["depth"]:
-            if (i_x % 2) == 0:
-                self.relative_waypoints.append({"y": 0, "x": i_x * self.search_parameters["distance"]})
-                self.relative_waypoints.append(
-                    {"y": self.search_parameters["width"], "x": i_x * self.search_parameters["distance"]})
-            else:
-                self.relative_waypoints.append(
-                    {"y": self.search_parameters["width"], "x": i_x * self.search_parameters["distance"]})
-                self.relative_waypoints.append({"y": 0, "x": i_x * self.search_parameters["distance"]})
-            i_x = i_x + 1
-        self.relative_waypoints.append({"y": 0, "x": 0})  # Last Waypoint will always be point of mission Start
+        self.calculate_waypoints(search_area_width,search_area_depth)
 
     # Tracks the relative position of the drone in relation to the position of the initialization of the Object
     # the unit should be cm since vgx is in cm/s and time.time() in seconds but this does not really match
@@ -114,7 +96,7 @@ class Waypoint_navigation:
             #print("yaw_error: "+str(yaw_error))
             #print("----------------\n")
         # Detecting if waypoint is reached
-        if self.mag_to_waypoint < 3:
+        if self.mag_to_waypoint < 2:
             self.waypoint_index = self.waypoint_index + 1
             if self.waypoint_index > len(self.waypoints)-1:  # Stay at last waypoint if it is reached
                 self.waypoint_index = self.waypoint_index - 1
@@ -123,8 +105,25 @@ class Waypoint_navigation:
         #print("rc_control"+ str(rc_control))
         return rc_control
 
-    def calculateWaypoints(self):
-        #this function transforms the relative waypoints into absolute waypoints. position is used as coordination system
+    def calculate_waypoints(self, search_area_width=10, search_area_depth=10):
+        # Calculating relative waypoints in the coordinate system of the drone, z not needed since Tello maintains height
+        self.relative_waypoints = []
+        self.search_parameters["width"] = int(search_area_width)
+        self.search_parameters["depth"] = int(search_area_depth)
+        i_x = 0
+        while i_x * self.search_parameters["distance"] < self.search_parameters["depth"]:
+            if (i_x % 2) == 0:
+                self.relative_waypoints.append({"y": 0, "x": i_x * self.search_parameters["distance"]})
+                self.relative_waypoints.append(
+                    {"y": self.search_parameters["width"], "x": i_x * self.search_parameters["distance"]})
+            else:
+                self.relative_waypoints.append(
+                    {"y": self.search_parameters["width"], "x": i_x * self.search_parameters["distance"]})
+                self.relative_waypoints.append({"y": 0, "x": i_x * self.search_parameters["distance"]})
+            i_x = i_x + 1
+        self.relative_waypoints.append({"y": 0, "x": 0})  # Last Waypoint will always be point of mission Start
+        print("relative_waypoints: "+ str(self.relative_waypoints))
+        #transforming the relative waypoints into absolute waypoints. position is used as coordination system
         self.waypoint_index = 0
         self.waypoints = []
         point_zero = self.position

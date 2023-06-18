@@ -114,12 +114,13 @@ while True:
     waypoint_navigator.update_position(me.get_current_state())
     if "Auto" in gui.flight_mode:  # Flight mode is Auto
         if not waypoint_navigator.navigator_active: #Check if first loop where flight mode is Auto to calculate position of Waypoints in world coordinate system
-            waypoint_navigator.calculateWaypoints()
+            search_area_size = gui.get_search_area_size()
+            waypoint_navigator.calculate_waypoints(search_area_size["width"],search_area_size["depth"])
             waypoint_navigator.navigator_active = True
         if "SPACE" in keys_pressed: #if flight mode is Auto Space as dead man switch is pressed drone follows Waypoints
             rc_control = waypoint_navigator.navigate(me.get_current_state())
             person_cords = person_tracker(img)
-            print(person_cords)
+            #print(person_cords)
             if person_cords is not None:
                 rc_control = Yaw_follow(person_cords)
             #print("Yaw: " + str(me.get_yaw()))

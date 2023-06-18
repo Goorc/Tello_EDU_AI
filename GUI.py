@@ -61,13 +61,13 @@ class GuiObject:
         self.text_input_position = {"x": self.image_width+50, "y": 155, "padding": 50}
         self.search_area_name = self.font.render("Search Area", True, (0, 0, 0))
         self.depth_name = self.font.render("Depth:", True, (0, 0, 0))
-        self.height_name = self.font.render("Height:", True, (0, 0, 0))
+        self.width_name = self.font.render("Width:", True, (0, 0, 0))
         self.depth_rect = pygame.Rect(self.text_input_position["x"]+110,
                                       self.text_input_position["y"]+1*self.text_input_position["padding"], 200, 40)
-        self.height_rect = pygame.Rect(self.text_input_position["x"]+110,
+        self.width_rect = pygame.Rect(self.text_input_position["x"]+110,
                                        self.text_input_position["y"]+2*self.text_input_position["padding"], 200, 40)
         self.depth_text = "10"  # Default depth value
-        self.height_text = "10"  # Default height value
+        self.width_text = "10"  # Default width value
         self.selected_input = None
         #Waypoint information
         self.waypoint_information_rect = pygame.Rect(self.text_input_position["x"], self.text_input_position["y"], 0, 30)
@@ -124,6 +124,8 @@ class GuiObject:
         pygame.display.update()
         return ans
 
+    def get_search_area_size(self):
+        return {"width": self.width_text, "depth": self.depth_text}
     # Run the main game loop
     def draw(self, img, data_for_osd):
         for event in pygame.event.get():
@@ -133,25 +135,24 @@ class GuiObject:
                 if event.key == pygame.K_RETURN:
                     if self.depth_text == "":
                         self.depth_text = "10"
-                    if self.height_text == "":
-                        self.height_text = "10"
-
-                    if self.is_integer(self.depth_text) and self.is_integer(self.height_text):
+                    if self.width_text == "":
+                        self.width_text = "10"
+                    if self.is_integer(self.depth_text) and self.is_integer(self.width_text):
                         print("Depth:", self.depth_text)  # Replace with your desired logic
-                        print("Height:", self.height_text)  # Replace with your desired logic
+                        print("Width:", self.width_text)  # Replace with your desired logic
                     else:
                         print("Invalid input")
                     self.selected_input = None
                 elif event.key == pygame.K_BACKSPACE:
-                    if self.selected_input == "height":
-                        self.height_text = self.height_text[:-1]
+                    if self.selected_input == "width":
+                        self.width_text = self.width_text[:-1]
                     else:
                         self.depth_text = self.depth_text[:-1]
                 elif event.key <= 127:  # Ignore non-ASCII characters
                     char = chr(event.key)
                     if char.isdigit():
-                        if self.selected_input == "height":
-                            self.height_text += char
+                        if self.selected_input == "width":
+                            self.width_text += char
                         else:
                             self.depth_text += char
             elif event.type == MOUSEBUTTONDOWN:
@@ -162,8 +163,8 @@ class GuiObject:
                     self.flight_mode = "Auto"
                 elif self.depth_rect.collidepoint(mouse_pos):
                     self.selected_input = "depth"
-                elif self.height_rect.collidepoint(mouse_pos):
-                    self.selected_input = "height"
+                elif self.width_rect.collidepoint(mouse_pos):
+                    self.selected_input = "width"
         # Gray background for the window
         self.window.fill((220, 220, 220))
 
@@ -264,30 +265,30 @@ class GuiObject:
             # Render the input names
             self.window.blit(self.search_area_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+5))
             self.window.blit(self.depth_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+1*self.text_input_position["padding"]))
-            self.window.blit(self.height_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+2*self.text_input_position["padding"]))
+            self.window.blit(self.width_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+2*self.text_input_position["padding"]))
 
             # Draw the input boxes
             pygame.draw.rect(self.window, (255, 255, 255), self.depth_rect)
-            pygame.draw.rect(self.window, (255, 255, 255), self.height_rect)
+            pygame.draw.rect(self.window, (255, 255, 255), self.width_rect)
 
             # Render the input text
             depth_box = self.font.render(self.depth_text, True, (0, 0, 0))
-            height_box = self.font.render(self.height_text, True, (0, 0, 0))
+            width_box = self.font.render(self.width_text, True, (0, 0, 0))
             self.window.blit(depth_box, (self.depth_rect.x + 5, self.depth_rect.y + 5))
-            self.window.blit(height_box, (self.height_rect.x + 5, self.height_rect.y + 5))
+            self.window.blit(width_box, (self.width_rect.x + 5, self.width_rect.y + 5))
 
             # Highlight the selected input box
             if self.selected_input == "depth":
                 pygame.draw.rect(self.window, (0, 0, 255), self.depth_rect, 2)
-            elif self.selected_input == "height":
-                pygame.draw.rect(self.window, (0, 0, 255), self.height_rect, 2)
+            elif self.selected_input == "width":
+                pygame.draw.rect(self.window, (0, 0, 255), self.width_rect, 2)
         elif data_for_osd["waypoints"]:
             # Render the Waypoint information text
             text_surface_waypoint_information = self.font.render(self.waypoint_information_text, True, (0,0,0))
             self.window.blit(text_surface_waypoint_information,
                              (self.waypoint_information_rect.x + 5, self.waypoint_information_rect.y + 5))
             n_waypoints = len(data_for_osd["waypoints"])
-            self.waypoint_index_text = "Index: " + str(data_for_osd["waypoint_index"]) + " of " + str(n_waypoints)
+            self.waypoint_index_text = "Index: " + str(data_for_osd["waypoint_index"]+1) + " of " + str(n_waypoints)
             text_surface_waypoint_index = self.font.render(self.waypoint_index_text, True, (0,0,0))
             self.window.blit(text_surface_waypoint_index,
                              (self.waypoint_index_rect.x + 5, self.waypoint_index_rect.y + 5))
