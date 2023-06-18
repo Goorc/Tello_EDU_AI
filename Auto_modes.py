@@ -158,7 +158,7 @@ class YawFollow:
     This class makes it possible to keep an object which position is known in the center of the frame by rotating Tello
     along the Yaw-Axis
     """
-    def navigate(self,obj_cords):
+    def navigate(obj_cords):
         """
         This method returns the appropriate rc_control values to keep the object with the known coordinates in the
         center of the frame
