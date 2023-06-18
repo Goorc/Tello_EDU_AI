@@ -12,7 +12,6 @@ class Waypoint_navigation:
     relative_waypoints = []  # List of dictionaries of the relative_waypoints in the coordinate system of the drone
     waypoints = [] # List of dictionaries of the waypoints in the world coordinate system
     waypoint_index = 0   # Indicates which waypoint is the next to be reached in  navigate()
-    navigator_active = False  # is used as a status indicator to whether the automatic search is active or not
     mag_to_waypoint = 0
 
     def __init__(self, current_state, search_area_width=10, search_area_depth=10):

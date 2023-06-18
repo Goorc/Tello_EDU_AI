@@ -109,14 +109,14 @@ while True:
     #Registering Keyboard Inputs
     keys_pressed = gui.getKeyboardInput()
     #Converting keyboard inputs into control commands for Tello
+    #  Default flight mode is Manual for safety reasons, values might get overwritten later in the loop
     rc_control = keyboard2control(keys_pressed)
     #Updating relative Position of Tello
     waypoint_navigator.update_position(me.get_current_state())
-    if "Auto" in gui.flight_mode:  # Flight mode is Auto
-        if not waypoint_navigator.navigator_active: #Check if first loop where flight mode is Auto to calculate position of Waypoints in world coordinate system
+    if gui.flight_mode == "Auto":  # Flight mode is Auto
+        if gui.prev_flight_mode == "Manual": #Check if first loop where flight mode is Auto to calculate position of Waypoints in world coordinate system
             search_area_size = gui.get_search_area_size()
             waypoint_navigator.calculate_waypoints(search_area_size["width"],search_area_size["depth"])
-            waypoint_navigator.navigator_active = True
         if "SPACE" in keys_pressed: #if flight mode is Auto Space as dead man switch is pressed drone follows Waypoints
             rc_control = waypoint_navigator.navigate(me.get_current_state())
             person_cords = person_tracker(img)
@@ -126,8 +126,8 @@ while True:
             #print("Yaw: " + str(me.get_yaw()))
             #print(waypoint_navigator.position)
             #print(rc_control)
-    else:  # Flight mode is Manual
-        waypoint_navigator.navigator_active = False
+
+
     #Sending rc controls either set by keyboard input or Algorithm to drone
     me.send_rc_control(rc_control[0], rc_control[1], rc_control[2], rc_control[3])
     sleep(0.05)

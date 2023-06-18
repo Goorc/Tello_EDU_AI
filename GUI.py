@@ -123,6 +123,7 @@ class GuiObject:
         return {"width": self.width_text, "depth": self.depth_text}
     # Run the main game loop
     def draw(self, img, data_for_osd):
+        self.prev_flight_mode = self.flight_mode
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
@@ -299,6 +300,6 @@ class GuiObject:
                              (self.waypoint_mag_rect.x + 5, self.waypoint_mag_rect.y + 5))
 
 
-        self.prev_flight_mode = self.flight_mode
+
         # Update the display
         pygame.display.update()
