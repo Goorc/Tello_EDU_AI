@@ -69,6 +69,17 @@ class GuiObject:
         self.depth_text = "10"  # Default depth value
         self.height_text = "10"  # Default height value
         self.selected_input = None
+        #Waypoint information
+        self.waypoint_information_rect = pygame.Rect(self.text_input_position["x"], self.text_input_position["y"], 0, 30)
+        self.waypoint_information_text = "Next Waypoint:"
+        self.waypoint_index_rect = pygame.Rect(self.text_input_position["x"], self.text_input_position["y"]+50, 0, 30)
+        self.waypoint_index_text = ""
+        self.waypoint_x_rect = pygame.Rect(self.text_input_position["x"], self.text_input_position["y"]+80, 0, 30)
+        self.waypoint_x_text = ""
+        self.waypoint_y_rect = pygame.Rect(self.text_input_position["x"]+150, self.text_input_position["y"]+80, 0, 30)
+        self.waypoint_y_text = ""
+        self.waypoint_mag_rect = pygame.Rect(self.text_input_position["x"], self.text_input_position["y"]+110, 0, 30)
+        self.waypoint_mag_text = ""
 
     def is_integer(self,string):
         try:
@@ -236,8 +247,7 @@ class GuiObject:
             status_msg = "Hold SPACE to search Area"
         elif self.flight_mode == "Auto" and "SPACE" in data_for_osd["keys_pressed"] and data_for_osd["person_cords"] is None:
             number_of_waypoints = len(data_for_osd["waypoints"])
-            status_msg = "Searching,"+ " distance to Waypoint " + str(data_for_osd["waypoint_index"]+1)+\
-                         "/"+ str(number_of_waypoints) +": "+ str(round(data_for_osd["mag_to_waypoint"],1))
+            status_msg = "Searching"
         elif self.flight_mode == "Auto" and "SPACE" in data_for_osd["keys_pressed"] and data_for_osd["person_cords"] is not None:
             status_msg = "Person found"
             status_color = (150, 0, 0)
@@ -247,11 +257,10 @@ class GuiObject:
         text_surface_status = self.font.render(status_msg, True, status_color)
         self.window.blit(text_surface_status, (self.text_field_status_rect.x + 5, self.text_field_status_rect.y + 5))
 
+        # Render the input Box background
+        pygame.draw.rect(self.window, (192, 192, 192),
+                         pygame.Rect(self.text_input_position["x"], self.text_input_position["y"], 500, 160))
         if self.flight_mode == "Manual":
-            #Render the input Box
-            pygame.draw.rect(self.window, (192,192,192), pygame.Rect(self.text_input_position["x"], self.text_input_position["y"], 500, 160))
-
-
             # Render the input names
             self.window.blit(self.search_area_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+5))
             self.window.blit(self.depth_name, (self.text_input_position["x"]+5, self.text_input_position["y"]+1*self.text_input_position["padding"]))
@@ -272,6 +281,29 @@ class GuiObject:
                 pygame.draw.rect(self.window, (0, 0, 255), self.depth_rect, 2)
             elif self.selected_input == "height":
                 pygame.draw.rect(self.window, (0, 0, 255), self.height_rect, 2)
+        elif data_for_osd["waypoints"]:
+            # Render the Waypoint information text
+            text_surface_waypoint_information = self.font.render(self.waypoint_information_text, True, (0,0,0))
+            self.window.blit(text_surface_waypoint_information,
+                             (self.waypoint_information_rect.x + 5, self.waypoint_information_rect.y + 5))
+            n_waypoints = len(data_for_osd["waypoints"])
+            self.waypoint_index_text = "Index: " + str(data_for_osd["waypoint_index"]) + " of " + str(n_waypoints)
+            text_surface_waypoint_index = self.font.render(self.waypoint_index_text, True, (0,0,0))
+            self.window.blit(text_surface_waypoint_index,
+                             (self.waypoint_index_rect.x + 5, self.waypoint_index_rect.y + 5))
+            self.waypoint_x_text = "X: " + str(round(data_for_osd["waypoints"][data_for_osd["waypoint_index"]]["x"],1))
+            text_surface_waypoint_x = self.font.render(self.waypoint_x_text, True, (0,0,0))
+            self.window.blit(text_surface_waypoint_x,
+                             (self.waypoint_x_rect.x + 5, self.waypoint_x_rect.y + 5))
+            self.waypoint_y_text = "Y: " + str(round(data_for_osd["waypoints"][data_for_osd["waypoint_index"]]["y"],1))
+            text_surface_waypoint_y = self.font.render(self.waypoint_y_text, True, (0,0,0))
+            self.window.blit(text_surface_waypoint_y,
+                             (self.waypoint_y_rect.x + 5, self.waypoint_y_rect.y + 5))
+            self.waypoint_mag_text = "Distance: " + str(round(data_for_osd["mag_to_waypoint"],1))
+            text_surface_waypoint_mag = self.font.render(self.waypoint_mag_text, True, (0,0,0))
+            self.window.blit(text_surface_waypoint_mag,
+                             (self.waypoint_mag_rect.x + 5, self.waypoint_mag_rect.y + 5))
+
 
 
         # Update the display
