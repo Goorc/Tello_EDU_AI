@@ -1,14 +1,23 @@
 import cv2
 import pygame
 from pygame.locals import *
-import time
-import numpy as np
+
 
 class GuiObject:
+    """
+        The GuiObject class provides functionality for creating and managing a Pygame-based graphical user interface (GUI).
+        It handles user inputs, such as button clicks and keyboard events, and displays information on the OSD.
+
+        :param self.flight_mode: The current flight mode (default: "Manual").
+        :param self.prev_flight_mode: The flight_mode in the previous call of self.draw().
+    """
 
     flight_mode = "Manual"
     prev_flight_mode = ""
     def __init__(self):
+        """
+        Initializes the GuiObject instance and sets up the Pygame window and GUI elements.
+        """
         # Initialize Pygame
         pygame.init()
 
@@ -83,6 +92,11 @@ class GuiObject:
         self.waypoint_mag_text = ""
 
     def getKeyboardInput(self):
+        """
+        Retrieves the currently pressed keys from the keyboard.
+
+        :return: List of strings which indicate the relevant keys pressed
+        """
         keys_pressed = []
         if self.getKey("LEFT"):
             keys_pressed.append("LEFT")
@@ -110,6 +124,11 @@ class GuiObject:
             keys_pressed.append("m")
         return keys_pressed
     def getKey(self,keyName):
+        """
+        Returns a Boolean indicating whether a specific key is currently pressed.
+        :param keyName: Name of specific key
+        :return: True if key is pressed
+        """
         ans = False
         for eve in pygame.event.get(): pass
         keyInput = pygame.key.get_pressed()
@@ -120,9 +139,19 @@ class GuiObject:
         return ans
 
     def get_search_area_size(self):
+        """
+        Returns the dimensions of the search area as a dictionary.
+        :return: dimensions of the search area as a dictionary
+        """
         return {"width": self.width_text, "depth": self.depth_text}
     # Run the main game loop
     def draw(self, img, data_for_osd):
+        """
+        Draws the GUI on the Pygame window based on the provided image and OSD data.
+
+        :param img: Image of the video feed to be implemented into the gui
+        :param data_for_osd: Dictionary containing the data for the on screen display of relevant mission parameters
+        """
         self.prev_flight_mode = self.flight_mode
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -298,8 +327,6 @@ class GuiObject:
             text_surface_waypoint_mag = self.font.render(self.waypoint_mag_text, True, (0,0,0))
             self.window.blit(text_surface_waypoint_mag,
                              (self.waypoint_mag_rect.x + 5, self.waypoint_mag_rect.y + 5))
-
-
 
         # Update the display
         pygame.display.update()
