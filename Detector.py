@@ -148,6 +148,9 @@ class PersonDetectorYoloV7():
 
 
 class Green_detector:
+    """
+        This Class can be used to recognise the biggest coherent green dot in the Image. Can be used as a test instead of the person tracker
+    """
     def detect(image):
         """
         Returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of the person tracker

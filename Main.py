@@ -21,6 +21,7 @@ def keyboard_to_control(keys_pressed, control_value = 70):
     :return: The rc controls according to keys_pressed
 
     """
+
     lr, fb, ud, yv = 0, 0, 0, 0
 
     if "DOWN" in keys_pressed:
@@ -48,14 +49,14 @@ def keyboard_to_control(keys_pressed, control_value = 70):
     return [lr, fb, ud, yv]
 
 
-me = tello.Tello()
-me.connect()
+me = tello.Tello()#me.connect()
 gui = GuiObject()
 person_detector = PersonDetectorYoloV7()
 waypoint_navigator = WaypointNavigation(me.get_current_state())
 yaw_follower = YawFollow()
 me.streamon()
 rc_control = [0, 0, 0, 0]
+
 
 # Main Loop
 while True:

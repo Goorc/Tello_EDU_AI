@@ -5,7 +5,6 @@ Tello_EDU_AI
    :maxdepth: 4
 
    Auto_modes
-   Green_detector
+   Detector
    Gui
    Main
-   PersonDetector
