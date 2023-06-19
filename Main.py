@@ -3,7 +3,7 @@ The Main module houses the main loop and some additional functions which are nee
 """
 from djitellopy import tello
 from time import sleep
-from PersonDetector import PersonDetectorYoloV7
+from Detector import PersonDetectorYoloV7
 from Auto_modes import WaypointNavigation
 from Auto_modes import YawFollow
 from Gui import GuiObject
