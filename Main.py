@@ -49,7 +49,8 @@ def keyboard_to_control(keys_pressed, control_value = 70):
     return [lr, fb, ud, yv]
 
 
-me = tello.Tello()#me.connect()
+me = tello.Tello()
+me.connect()
 gui = GuiObject()
 person_detector = PersonDetectorYoloV7()
 waypoint_navigator = WaypointNavigation(me.get_current_state())

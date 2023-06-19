@@ -59,7 +59,7 @@ class PersonDetectorYoloV3():
 
 class PersonDetectorYoloV7():
 
-    def __init__(self, resolution=(128, 128)):
+    def __init__(self, resolution=(256, 256)):
         self.detector = Yolov7Detector(traced=False, img_size=resolution, conf_thres=0.6)
         self.classes = None
         self.boxes = None
