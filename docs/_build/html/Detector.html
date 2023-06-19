@@ -51,12 +51,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#Detector.Green_detector.detect"><code class="docutils literal notranslate"><span class="pre">Green_detector.detect()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#Detector.PersonDetectorYoloV3"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV3</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#Detector.PersonDetectorYoloV3.detect"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV3.detect()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Detector.PersonDetectorYoloV3.drawBoxesOnImg"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV3.drawBoxesOnImg()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="#Detector.PersonDetectorYoloV7"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV7</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Detector.PersonDetectorYoloV7.calcBoxCenter"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV7.calcBoxCenter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Detector.PersonDetectorYoloV7.calcDistance"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV7.calcDistance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Detector.PersonDetectorYoloV7.detect"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV7.detect()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Detector.PersonDetectorYoloV7.drawBoxesOnImg"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV7.drawBoxesOnImg()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Detector.PersonDetectorYoloV7.drawTrackPointOnImg"><code class="docutils literal notranslate"><span class="pre">PersonDetectorYoloV7.drawTrackPointOnImg()</span></code></a></li>
@@ -120,29 +117,31 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="Detector.PersonDetectorYoloV3">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Detector.</span></span><span class="sig-name descname"><span class="pre">PersonDetectorYoloV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yoloConfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'yolov3.cfg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yoloWeights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'yolov3.weights'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yoloClasses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coco.names'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV3" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="Detector.PersonDetectorYoloV3.detect">
-<span class="sig-name descname"><span class="pre">detect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV3.detect" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Detector.PersonDetectorYoloV3.drawBoxesOnImg">
-<span class="sig-name descname"><span class="pre">drawBoxesOnImg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boxes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV3.drawBoxesOnImg" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="Detector.PersonDetectorYoloV7">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Detector.</span></span><span class="sig-name descname"><span class="pre">PersonDetectorYoloV7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV7" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Detector.</span></span><span class="sig-name descname"><span class="pre">PersonDetectorYoloV7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV7" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to detect Persons in an image. It uses the Yolo objetd-detection system.
+For a given image the system detects all Persons and generate a tracking position in pixels.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Detector.PersonDetectorYoloV7.calcBoxCenter">
+<span class="sig-name descname"><span class="pre">calcBoxCenter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">box</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV7.calcBoxCenter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Detector.PersonDetectorYoloV7.calcDistance">
+<span class="sig-name descname"><span class="pre">calcDistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV7.calcDistance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="Detector.PersonDetectorYoloV7.detect">
-<span class="sig-name descname"><span class="pre">detect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detector.PersonDetectorYoloV7.detect" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">detect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#Detector.PersonDetectorYoloV7.detect" title="Permalink to this definition"></a></dt>
+<dd><p>main function which is called to detect a person in a given image and returns a trackin-position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Detector.PersonDetectorYoloV7.drawBoxesOnImg">

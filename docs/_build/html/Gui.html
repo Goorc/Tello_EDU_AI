@@ -50,11 +50,9 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Gui module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Gui.GuiObject"><code class="docutils literal notranslate"><span class="pre">GuiObject</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#Gui.GuiObject.draw"><code class="docutils literal notranslate"><span class="pre">GuiObject.draw()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Gui.GuiObject.flight_mode"><code class="docutils literal notranslate"><span class="pre">GuiObject.flight_mode</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Gui.GuiObject.getKey"><code class="docutils literal notranslate"><span class="pre">GuiObject.getKey()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Gui.GuiObject.getKeyboardInput"><code class="docutils literal notranslate"><span class="pre">GuiObject.getKeyboardInput()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Gui.GuiObject.get_search_area_size"><code class="docutils literal notranslate"><span class="pre">GuiObject.get_search_area_size()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Gui.GuiObject.prev_flight_mode"><code class="docutils literal notranslate"><span class="pre">GuiObject.prev_flight_mode</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -106,7 +104,7 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="Gui.GuiObject.draw">
-<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_for_osd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Gui.GuiObject.draw" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_for_osd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Gui.GuiObject.draw" title="Permalink to this definition"></a></dt>
 <dd><p>Draws the GUI on the Pygame window based on the provided image and OSD data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -117,11 +115,6 @@
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="Gui.GuiObject.flight_mode">
-<span class="sig-name descname"><span class="pre">flight_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Manual'</span></em><a class="headerlink" href="#Gui.GuiObject.flight_mode" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Gui.GuiObject.getKey">
@@ -148,11 +141,6 @@
 <dd><p>Returns the dimensions of the search area as a dictionary.
 :return: dimensions of the search area as a dictionary</p>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="Gui.GuiObject.prev_flight_mode">
-<span class="sig-name descname"><span class="pre">prev_flight_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#Gui.GuiObject.prev_flight_mode" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
