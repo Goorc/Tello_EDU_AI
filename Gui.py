@@ -113,14 +113,12 @@ class GuiObject:
             keys_pressed.append("a")
         if self.getKey("d"):
             keys_pressed.append("d")
-        if self.getKey("q"):
-            keys_pressed.append("q")
+        if self.getKey("l"):
+            keys_pressed.append("l")
         if self.getKey("h"):
             keys_pressed.append("h")
         if self.getKey("SPACE"):
             keys_pressed.append("SPACE")
-        if self.getKey("m"):
-            keys_pressed.append("m")
         return keys_pressed
     def getKey(self,keyName:str) -> str:
         """

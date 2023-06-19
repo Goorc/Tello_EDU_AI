@@ -39,12 +39,10 @@ def keyboard_to_control(keys_pressed: list, control_value:int = 70):
         yv = -control_value
     elif "d" in keys_pressed:
         yv = control_value
-    if "q" in keys_pressed and not me.is_flying:
+    if "l" in keys_pressed and not me.is_flying:
         me.takeoff()
-    elif "q" in keys_pressed and me.is_flying:
+    elif "l" in keys_pressed and me.is_flying:
         me.land()
-    if "h" in keys_pressed:
-        me.stop()
     return [lr, fb, ud, yv]
 
 
