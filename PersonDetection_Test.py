@@ -1,6 +1,6 @@
 from djitellopy import tello
 from time import sleep
-from Detector import PersonDetectorYoloV7
+from Detectors import PersonDetectorYoloV7
 import cv2
 import time
 
