@@ -106,8 +106,8 @@ gui.draw(me.get_frame_read().frame, me.get_current_state(), AutoSearch.relative_
 person_detector = PersonDetectorYoloV7()
 print(me.get_current_state())
 while True:
+    
     img = me.get_frame_read().frame
-
     #Registering Keyboard Inputs
     keys_pressed = gui.getKeyboardInput()
     #Converting keyboard inputs into control commands for Tello

@@ -6,7 +6,7 @@ import cv2
 import time
 
 kp.init()
-me = tello.Tello("192.168.0.214")
+me = tello.Tello()
 me.connect()
 print("Batterylevel:", me.get_battery(), "%")
 
@@ -34,9 +34,9 @@ while True:
 
     time4 = time.time()
 
-    # print("Time to get frame:", time2-time1)
-    # print("Time to detect:", time3-time2)
-    # print("Time to draw:", time4-time3)
+    print("Time to get frame:", time2-time1)
+    print("Time to detect:", time3-time2)
+    print("Time to draw:", time4-time3)
 
     # print("FPS:", 1/(time4-time1))
 
