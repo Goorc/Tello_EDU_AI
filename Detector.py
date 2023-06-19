@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 import time
+import math
 from yolov7_package import Yolov7Detector
+
 
 
 class PersonDetectorYoloV7():
@@ -10,93 +12,120 @@ class PersonDetectorYoloV7():
     Class to detect Persons in an image. It uses the Yolo objetd-detection system.
     For a given image the system detects all Persons and generate a tracking position in pixels.
     """
+    
 
-    def __init__(self, resolution=(128, 128)):
-        self.detector = Yolov7Detector(traced=False, img_size=resolution, conf_thres=0.6)
+    def __init__(self, resolution:tuple = (128, 128)) -> None:
+        
+        """"
+        :param resolution: input-resolution of the image for the detector. The higher the resolution the more accurate the detection but the slower the detection.
+        """
+
+        
+        self.detector = Yolov7Detector(traced=False,img_size=resolution,conf_thres=0.6)
         self.classes = None
         self.boxes = None
         self.scores = None
+        self.detections = None
+
+        self.trackedPerson = None
+
+    def detect(self, img: np.ndarray) -> dict:
+        """
+        
+        main function which is called to detect a person in a given image and returns a trackin-position
+        
+        :return: 
+
+        """
+        classes, boxes, scores = self.detector.detect(img)    
+        
+        self.detections = []
 
         self.trackedPersonBox = None
-        self.trackedPersonScore = None
-        self.trackedPoint = None
 
-    def detect(self, img):
-        classes, boxes, scores = self.detector.detect(img)
-
-        self.classes = []
-        self.boxes = []
-        self.scores = []
-
-        self.trackedPersonBox = None
-        self.trackedPersonScore = None
+        
 
         for i in range(len(classes[0])):
-            if (classes[0][i] == 0):
+            if(classes[0][i] == 0):
+                centerPoint = self.calcBoxCenter(boxes[0][i])
+                detection = {"center":centerPoint,"box": boxes[0][i],"score":scores[0][i]}
+                self.detections.append(detection)
 
-                if (self.trackedPersonScore is None):
-                    self.trackedPersonScore = scores[0][i]
-                    self.trackedPersonBox = boxes[0][i]
-                else:
-                    if (scores[0][i] > self.trackedPersonScore):
-                        self.trackedPersonScore = scores[0][i]
-                        self.trackedPersonBox = boxes[0][i]
+        if(len(self.detections) == 0):
+            print("No Person detected")
+            self.trackedPerson = None
+            return None
 
-                # boxes[0][i][0] = 100
-                # boxes[0][i][1] = 90
-                # boxes[0][i][2] = 300
-                # boxes[0][i][3] = 100
+        #if there is no tracked Person yet search for detection with highest score
+        if(self.trackedPerson == None):
+            for detection in self.detections:
+                if(self.trackedPerson == None or detection["score"] > self.trackedPerson["score"]):
+                    self.trackedPerson = detection
+        #if there is a tracked Person searc for detection with closest center point
+        else:
+            closestDetection = 1000000
+            newTrackedPerson = None
+            for detection in self.detections:
+                distance = self.calcDistance(self.trackedPerson["center"],detection["center"])
+                if(distance < closestDetection):
+                    closestDetection = distance
+                    newTrackedPerson = detection
+            self.trackedPerson = newTrackedPerson
 
-                self.classes.append(classes[0][i])
-                self.boxes.append(boxes[0][i])
-                self.scores.append(scores[0][i])
 
-        if (self.trackedPersonBox is not None):
-            x1, y1, x2, y2 = self.trackedPersonBox
 
-            x = (x1 + x2) / 2
-            y = (y1 + y2) / 2
-            self.trackedPoint = {"x": int(x), "y": int(y), "img_width": img.shape[1], "img_height": img.shape[0]}
-            return self.trackedPoint
-        return None
+    def calcDistance(self,point1,point2):
+        x1,y1 = point1
+        x2,y2 = point2
+        return math.sqrt((x2-x1)**2+(y2-y1)**2)
 
-    def drawTrackPointOnImg(self, img):
-        if (self.trackedPoint is None):
+
+
+    def calcBoxCenter(self,box):
+        x1,y1,x2,y2 = box
+        x = (x1+x2)/2
+        y = (y1+y2)/2
+        return (x,y)
+    
+
+    def drawTrackPointOnImg(self,img):
+        if(self.trackedPerson is None):
             return img
         else:
-            # draw crosshair
-            # black = np.zeros((480,640,3), np.uint8)
-            # self.trackedPoint = (320,240)
-            cv2.line(img, (self.trackedPoint["x"] - 10, self.trackedPoint["y"]),
-                     (self.trackedPoint["x"] + 10, self.trackedPoint["y"]), (0, 255, 0), thickness=2)
-            cv2.line(img, (self.trackedPoint["x"], self.trackedPoint["y"] - 10),
-                     (self.trackedPoint["x"], self.trackedPoint["y"] + 10), (0, 255, 0), thickness=2)
+            center = self.trackedPerson["center"]
+            x = int(center[0])
+            y = int(center[1])
+            cv2.circle(img,(x,y),5,(0,255,0),thickness=2)
 
+           
             return img
 
-    def drawTrackedPersonOnImg(self, img):
-        if (self.trackedPersonBox is None):
+
+    def drawTrackedPersonOnImg(self,img):
+        if(self.trackedPersonBox is None):
             return img
         else:
-            # get points as integer
-            x1, y1, x2, y2 = self.trackedPersonBox
+            #get points as integer
+            x1,y1,x2,y2 = self.trackedPersonBox
             x1 = int(x1)
             y1 = int(y1)
             x2 = int(x2)
             y2 = int(y2)
-            cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 1)
+            cv2.rectangle(img, (x1,y1), (x2,y2), (255,0,0), 1)
             # cv2.line(img,(x1,y1),(x2,y2),(0,255,0),thickness=2)
 
             self.drawTrackPointOnImg(img)
             return img
 
-    def drawBoxesOnImg(self, img):
 
-        if (self.classes is None or self.boxes is None or self.scores is None):
+    def drawBoxesOnImg(self,img):
+        
+        if(self.classes is None or self.boxes is None or self.scores is None):
             print("No detection yet")
             return img
 
         return self.detector.draw_on_image(img, self.boxes, self.scores, self.classes)
+
 
 
 class Green_detector:

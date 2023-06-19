@@ -7,12 +7,20 @@ from yolov7_package import Yolov7Detector
 
 
 class PersonDetectorYoloV7():
+
     """
     Class to detect Persons in an image. It uses the Yolo objetd-detection system.
     For a given image the system detects all Persons and generate a tracking position in pixels.
     """
+    
 
-    def __init__(self,resolution=(128,128)):
+    def __init__(self, resolution:tuple = (128, 128)) -> None:
+        
+        """"
+        :param resolution: input-resolution of the image for the detector. The higher the resolution the more accurate the detection but the slower the detection.
+        """
+
+        
         self.detector = Yolov7Detector(traced=False,img_size=resolution,conf_thres=0.6)
         self.classes = None
         self.boxes = None
@@ -21,7 +29,7 @@ class PersonDetectorYoloV7():
 
         self.trackedPerson = None
 
-    def detect(self, img):
+    def detect(self, img: np.ndarray) -> dict:
         """
         
         main function which is called to detect a person in a given image and returns a trackin-position

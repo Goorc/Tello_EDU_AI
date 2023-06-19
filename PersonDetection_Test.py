@@ -1,15 +1,10 @@
 from djitellopy import tello
 from time import sleep
-from PersonDetector import PersonDetectorYoloV7
+from Detector import PersonDetectorYoloV7
 import cv2
 import time
 
-<<<<<<< HEAD:PersonDetection_Test.py
-kp.init()
 me = tello.Tello()
-=======
-me = tello.Tello("192.168.0.214")
->>>>>>> main:old/PersonDetection_Test.py
 me.connect()
 print("Batterylevel:", me.get_battery(), "%")
 
