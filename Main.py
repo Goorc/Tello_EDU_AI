@@ -12,14 +12,13 @@ import logging
 logging.getLogger('djitellopy').setLevel(logging.WARNING)  # suppress annoying warnings
 
 
-def keyboard_to_control(keys_pressed, control_value = 70):
+def keyboard_to_control(keys_pressed: list, control_value:int = 70):
     """
     Converts the pressed keys on the keyboard into the corresponding rc controls wich can be sent to tello, also handles takeoff and landing commands
 
     :param keys_pressed: List of relevant keys pressed on the computer Keyboard
     :param control_value: value of rc_control if key is pressed range from -100 to 100, negative values to invert
     :return: The rc controls according to keys_pressed
-
     """
 
     lr, fb, ud, yv = 0, 0, 0, 0
@@ -64,14 +63,14 @@ while True:
     person_cords = None
     img = me.get_frame_read().frame
 
-    #Registering Keyboard Inputs and converting keyboard inputs into control commands for Tello
+    # Registering Keyboard Inputs and converting keyboard inputs into control commands for Tello
     keys_pressed = gui.getKeyboardInput()
-    rc_control = keyboard_to_control(keys_pressed) # Default flight_mode is Manual
+    rc_control = keyboard_to_control(keys_pressed)  # Default flight_mode is Manual
 
-    #Updating relative Position of Tello
+    # Updating relative Position of Tello
     waypoint_navigator.update_position(me.get_current_state())
 
-    # check if flight_mode is Auto
+    # Check if flight_mode is Auto
     if gui.flight_mode == "Auto":
         if gui.prev_flight_mode == "Manual":  # Check if first loop where flight mode is Auto
             search_area_size = gui.get_search_area_size()
@@ -86,7 +85,7 @@ while True:
     me.send_rc_control(rc_control[0], rc_control[1], rc_control[2], rc_control[3])
     sleep(0.05)
 
-    # drawing the gui including camera feed
+    # Drawing the gui including camera feed
     data_for_osd = {"current_state": me.get_current_state(),
                     "person_cords": person_cords, "position": waypoint_navigator.position,
                     "mag_to_waypoint": waypoint_navigator.mag_to_waypoint, "waypoints": waypoint_navigator.waypoints,

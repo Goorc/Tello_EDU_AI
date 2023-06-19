@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 import pygame
 from pygame.locals import *
 
@@ -10,13 +11,12 @@ class GuiObject:
         :param self.flight_mode: The current flight mode (default: "Manual").
         :param self.prev_flight_mode: The flight_mode in the previous call of self.draw().
     """
-
-    flight_mode = "Manual"
-    prev_flight_mode = ""
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes the GuiObject instance and sets up the Pygame window and GUI elements.
         """
+        self.flight_mode = "Manual"
+        self.prev_flight_mode = ""
         # Initialize Pygame
         pygame.init()
 
@@ -90,11 +90,11 @@ class GuiObject:
         self.waypoint_mag_rect = pygame.Rect(self.text_input_position["x"], self.text_input_position["y"]+110, 0, 30)
         self.waypoint_mag_text = ""
 
-    def getKeyboardInput(self):
+    def getKeyboardInput(self) -> str:
         """
         Retrieves the currently pressed keys from the keyboard.
 
-        :return: List of strings which indicate the relevant keys pressed
+        :return: String which indicate the relevant keys pressed
         """
         keys_pressed = []
         if self.getKey("LEFT"):
@@ -122,7 +122,7 @@ class GuiObject:
         if self.getKey("m"):
             keys_pressed.append("m")
         return keys_pressed
-    def getKey(self,keyName):
+    def getKey(self,keyName:str) -> str:
         """
         Returns a Boolean indicating whether a specific key is currently pressed.
         :param keyName: Name of specific key
@@ -137,14 +137,14 @@ class GuiObject:
         pygame.display.update()
         return ans
 
-    def get_search_area_size(self):
+    def get_search_area_size(self) -> dict:
         """
         Returns the dimensions of the search area as a dictionary.
         :return: dimensions of the search area as a dictionary
         """
         return {"width": self.width_text, "depth": self.depth_text}
-    # Run the main game loop
-    def draw(self, img, data_for_osd):
+
+    def draw(self, img: np.ndarray, data_for_osd:dict) -> None:
         """
         Draws the GUI on the Pygame window based on the provided image and OSD data.
 
@@ -190,7 +190,7 @@ class GuiObject:
         # Gray background for the window
         self.window.fill((220, 220, 220))
 
-        #drawing tracking point on img
+        # drawing tracking point on img
         if "person_cords" in data_for_osd:
             if data_for_osd["person_cords"] is not None:
                 midpoint = (data_for_osd["person_cords"]["x"], data_for_osd["person_cords"]["y"])
@@ -220,7 +220,6 @@ class GuiObject:
             pygame.draw.rect(self.window, color_inactive, self.button1_rect)
             pygame.draw.rect(self.window, color_active, self.button2_rect)
 
-
         # Render the button captions
         font = pygame.font.SysFont("consolas", 20)  # You can adjust the font size here
         button1_text = font.render(self.button1_caption, True, (255, 255, 255))
@@ -235,14 +234,14 @@ class GuiObject:
         self.window.blit(button2_text, button2_text_rect)
 
         # Render the text fields
-        #Bat
+        # Battery
         pygame.draw.rect(self.window, (192, 192, 192), self.text_field_bat_rect)
         bat_color = (0, 150, 0)
         if data_for_osd["current_state"]["bat"] < 30:
             bat_color = (150,0,0)
         text_surface_bat = self.font.render("Battery: " + str(data_for_osd["current_state"]["bat"]) + "%", True, bat_color)
         self.window.blit(text_surface_bat, (self.text_field_bat_rect.x + 5, self.text_field_bat_rect.y + 5))
-        #Position
+        # Position
         if "position" in data_for_osd:
             pos_x = str(round(data_for_osd["position"]["x"], 1))
             pos_y = str(round(data_for_osd["position"]["y"], 1))
@@ -262,7 +261,7 @@ class GuiObject:
         self.window.blit(text_surface_posx, (self.text_field_posx_rect.x + 5, self.text_field_posx_rect.y + 5))
         self.window.blit(text_surface_posy, (self.text_field_posy_rect.x + 5, self.text_field_posy_rect.y + 5))
         self.window.blit(text_surface_posz, (self.text_field_posz_rect.x + 5, self.text_field_posz_rect.y + 5))
-        #Status
+        # Status
         status_color = (0, 0, 0)
         if self.flight_mode == "Manual":
             status_msg = "Switch to Auto to search area in front of drone"

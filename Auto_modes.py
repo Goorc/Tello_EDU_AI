@@ -17,7 +17,7 @@ class WaypointNavigation:
     :param self.mag_to_waypoint: Distance to next waypoint
     """
 
-    def __init__(self, current_state, search_area_width=10, search_area_depth=10):
+    def __init__(self, current_state: dict) -> None:
 
         self.position = {}
         self.previous_state = {}
@@ -31,7 +31,7 @@ class WaypointNavigation:
 
         self.previous_state = current_state
         self.position = {"x": 0, "y": 0, "z": 0, "yaw": current_state["yaw"], "time": time.time()}
-        self.calculate_waypoints(search_area_width,search_area_depth)
+        self.calculate_waypoints()
 
     def update_position(self, current_state):
         """
@@ -54,7 +54,7 @@ class WaypointNavigation:
         self.position = new_position
 
     #
-    def navigate(self, current_state):
+    def navigate(self, current_state: dict) -> list:
         """
         This method returns the steering inputs for Tello to follow the waypoints
 
@@ -112,7 +112,7 @@ class WaypointNavigation:
         rc_control = lr, fb, ud, yv
         return rc_control
 
-    def calculate_waypoints(self, search_area_width=10, search_area_depth=10):
+    def calculate_waypoints(self, search_area_width: int = 10, search_area_depth: int = 10):
         """
         This method calculates the waypoints according to the user input or the default values
 
@@ -153,7 +153,7 @@ class YawFollow:
     """
     This class makes it possible to keep an object which position is known in the center of the frame by rotating Tello along the Yaw-Axis
     """
-    def navigate(obj_cords):
+    def navigate(obj_cords: dict):
         """
         This method returns the appropriate rc_control values to keep the object with the known coordinates in the
         center of the frame
