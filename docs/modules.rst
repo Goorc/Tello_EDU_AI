@@ -5,6 +5,8 @@ Tello_EDU_AI
    :maxdepth: 4
 
    Auto_modes
-   Detector
+   Detectors
    Gui
    Main
+   PersonDetection_Test
+   Spielwiese3
