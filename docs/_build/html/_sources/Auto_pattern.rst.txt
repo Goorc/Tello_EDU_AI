@@ -1,0 +1,7 @@
+Auto\_pattern module
+====================
+
+.. automodule:: Auto_pattern
+   :members:
+   :undoc-members:
+   :show-inheritance:

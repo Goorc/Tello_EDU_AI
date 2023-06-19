@@ -1,0 +1,7 @@
+PersonPoseDetector module
+=========================
+
+.. automodule:: PersonPoseDetector
+   :members:
+   :undoc-members:
+   :show-inheritance:

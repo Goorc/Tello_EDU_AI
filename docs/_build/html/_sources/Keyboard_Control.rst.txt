@@ -1,0 +1,7 @@
+Keyboard\_Control module
+========================
+
+.. automodule:: Keyboard_Control
+   :members:
+   :undoc-members:
+   :show-inheritance:
