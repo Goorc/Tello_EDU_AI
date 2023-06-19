@@ -43,12 +43,13 @@ class PersonDetectorYoloV7():
 
         self.trackedPersonBox = None
 
-        
+        #get img size
+        img_width, img_height = img.shape[1], img.shape[0]
 
         for i in range(len(classes[0])):
             if(classes[0][i] == 0):
                 centerPoint = self.calcBoxCenter(boxes[0][i])
-                detection = {"center":centerPoint,"box": boxes[0][i],"score":scores[0][i]}
+                detection = {"x":int(centerPoint[0]),"y":int(centerPoint[1]),"img_height":img_height,"img_width":img_width, "center":centerPoint,"box": boxes[0][i],"score":scores[0][i]}
                 self.detections.append(detection)
 
         if(len(self.detections) == 0):
@@ -72,7 +73,7 @@ class PersonDetectorYoloV7():
                     newTrackedPerson = detection
             self.trackedPerson = newTrackedPerson
 
-
+        return self.trackedPerson
 
     def calcDistance(self,point1,point2):
         x1,y1 = point1
