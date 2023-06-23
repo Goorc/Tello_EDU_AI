@@ -1,0 +1,5 @@
+djitellopy
+numpy
+yolov7_package
+cv2
+pygame
