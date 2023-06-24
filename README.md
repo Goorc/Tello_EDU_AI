@@ -42,3 +42,5 @@ Exception: Command 'command' was unsuccessful for 4 tries. Latest response:     
 ```
 the computer is not connected  to the drone. Check the wifi connection and try again.
 
+The videofeed will be interrupted during takoff and landing and the GUI won't respont either, it will work normally after a few seconds.
+
