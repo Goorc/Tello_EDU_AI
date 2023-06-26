@@ -251,7 +251,7 @@ class GuiObject:
         pygame.draw.rect(self.window, (192, 192, 192), self.text_field_pos_rect)
         pygame.draw.rect(self.window, (192, 192, 192), self.text_field_posx_rect)
         pos_color = (0, 0, 0)
-        text_surface_pos = self.font.render("position:", True, pos_color)
+        text_surface_pos = self.font.render("Position:", True, pos_color)
         text_surface_posx = self.font.render("X: " + pos_x, True, pos_color)
         text_surface_posy = self.font.render("Y: " + pos_y, True, pos_color)
         text_surface_posz = self.font.render("Z: " + pos_z, True, pos_color)

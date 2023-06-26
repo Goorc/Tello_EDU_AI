@@ -1,7 +1,0 @@
-keyboard\_test\_georg module
-============================
-
-.. automodule:: keyboard_test_georg
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -64,8 +64,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Gui.html">Gui module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Main.html">Main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="PersonDetection_Test.html">PersonDetection_Test module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Spielwiese3.html">Spielwiese3 module</a></li>
 </ul>
 </li>
 </ul>
@@ -108,7 +106,7 @@
 <dd><p>Returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of the person tracker</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>image</strong> – input image to be analyzed</p>
+<dd class="field-odd"><p><strong>img</strong> – input image to be analyzed</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dictionary with position of tracked object and image size</p>
@@ -122,7 +120,7 @@
 <dt class="sig sig-object py" id="Detectors.PersonDetectorYoloV7">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Detectors.</span></span><span class="sig-name descname"><span class="pre">PersonDetectorYoloV7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Detectors.PersonDetectorYoloV7" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to detect Persons in an image. It uses the Yolo objetd-detection system.
+<p>Class to detect Persons in an image. It uses the Yolo object-detection system.
 For a given image the system detects all Persons and generate a tracking position in pixels.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Detectors.PersonDetectorYoloV7.calcBoxCenter">
@@ -139,8 +137,11 @@ For a given image the system detects all Persons and generate a tracking positio
 <span class="sig-name descname"><span class="pre">detect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#Detectors.PersonDetectorYoloV7.detect" title="Permalink to this definition"></a></dt>
 <dd><p>main function which is called to detect a person in a given image and returns a trackin-position</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img</strong> – input image to be analyzed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with position of tracked object and image size</p>
 </dd>
 </dl>
 </dd></dl>

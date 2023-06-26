@@ -9,15 +9,15 @@ from yolov7_package import Yolov7Detector
 class PersonDetectorYoloV7():
 
     """
-    Class to detect Persons in an image. It uses the Yolo objetd-detection system.
+    Class to detect Persons in an image. It uses the Yolo object-detection system.
     For a given image the system detects all Persons and generate a tracking position in pixels.
     """
     
 
     def __init__(self, resolution:tuple = (128, 128)) -> None:
         
-        """"
-        :param resolution: input-resolution of the image for the detector. The higher the resolution the more accurate the detection but the slower the detection.
+        """
+        :param resolution: input-resolution of the image for the detector. The higher the resolution the more accurate but slower the detection.
         """
 
         
@@ -31,10 +31,10 @@ class PersonDetectorYoloV7():
 
     def detect(self, img: np.ndarray) -> dict:
         """
-        
         main function which is called to detect a person in a given image and returns a trackin-position
-        
-        :return: 
+
+        :param img: input image to be analyzed
+        :return: Dictionary with position of tracked object and image size
 
         """
         classes, boxes, scores = self.detector.detect(img)    
@@ -133,15 +133,15 @@ class Green_detector:
     """
         This Class can be used to recognise the biggest coherent green dot in the Image. Can be used as a test instead of the person tracker
     """
-    def detect(image):
+    def detect(img):
         """
         Returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of the person tracker
 
-        :param image: input image to be analyzed
+        :param img: input image to be analyzed
         :return: Dictionary with position of tracked object and image size
         """
         # Convert the image to HSV color space
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
         # Define the lower and upper bounds of the green color
         lower_green = np.array([50, 50, 50])
@@ -168,7 +168,7 @@ class Green_detector:
             cy = int(moments['m01'] / moments['m00'])
 
             # Get the height and width of the image
-            height, width, channels = image.shape
+            height, width, channels = img.shape
             return {"x": cx, "y": cy, "img_width": width, "img_height": height}
         else:
             return None

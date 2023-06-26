@@ -1,7 +1,0 @@
-Testfile\_Georg module
-======================
-
-.. automodule:: Testfile_Georg
-   :members:
-   :undoc-members:
-   :show-inheritance:

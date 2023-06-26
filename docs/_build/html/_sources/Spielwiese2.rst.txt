@@ -1,7 +1,0 @@
-Spielwiese2 module
-==================
-
-.. automodule:: Spielwiese2
-   :members:
-   :undoc-members:
-   :show-inheritance:
