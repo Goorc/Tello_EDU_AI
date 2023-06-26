@@ -9,14 +9,14 @@ from yolov7_package import Yolov7Detector
 class PersonDetectorYoloV7():
 
     """
-    Class to detect Persons in an image. It uses the Yolo objetd-detection system.
+    Class to detect Persons in an image. It uses the Yolo object-detection system.
     For a given image the system detects all Persons and generate a tracking position in pixels.
     """
     
 
     def __init__(self, resolution:tuple = (128, 128)) -> None:
         
-        """"
+        """
         :param resolution: input-resolution of the image for the detector. The higher the resolution the more accurate the detection but the slower the detection.
         """
 
@@ -31,10 +31,9 @@ class PersonDetectorYoloV7():
 
     def detect(self, img: np.ndarray) -> dict:
         """
-        
         main function which is called to detect a person in a given image and returns a trackin-position
-        
-        :return: 
+
+        :return: Dictionary of with the midpoint of the detected person and the size of the image
 
         """
         classes, boxes, scores = self.detector.detect(img)    
