@@ -1,13 +1,13 @@
-## Tello Drone AI Educatianal Project
+## Tello Drone Educatianal AI Project
 ### 1. Introduction
-This Repository aims to show a potentzail use-case of the [Tello drone](https://www.ryzerobotics.com/de/tello) from Ryze. This drone can be controlled via a simple python API. You can send instructions to the drone and flight informations and a camera stream can be received over wifi.
+This Repository aims to show a use-case of the [Tello drone](https://www.ryzerobotics.com/de/tello) from Ryze. This drone can be controlled via a simple python API.
 
-The general idea of this project is to use the drone as simple search drone. It can searchs for persons in a given area. When a person is found, the drone will look at the persons and keep her in the camera center. If there is no person detected, the drone will follow a list of waypoints. At any given time the user is able to overwrite the current state and take control of the drone.
+The general idea of this project is to use the drone for simple search and rescue missions. It can search for persons in a given area. When a person is found it will notifiy the operator and keep it in the center of its videofeed. If there is no person detected, the drone will follow a list of waypoints. At any given time the user is able to overwrite the current state and take control of the drone.
 The whole system is described in the following flowchart:
 
 ![Alt text](misc/Tello_EDU_AI_FlowChart.png)
 
-Further in documentation can be found under docs\_build\html\index.html
+A more detailed documentation can be found under [docs\_build\html\index.html](docs/_build/html) as a .html page, just open intex.html in your browser of choice.
 ### 2. Installation
 to install all neccessary packages, just run the following command:
 ```bash
