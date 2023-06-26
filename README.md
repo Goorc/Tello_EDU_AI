@@ -19,14 +19,14 @@ before starting the program you have to connect to the drone via Wi-Fi. To start
 ```bash
 python main.py
 ```
-It will open a window with the camera stream and two buttons, "Auto" and "Manual". If you select "Manual" you can control the drone manually. If you select "Auto" the drone will compute the search area according to the userinput. To start the actual search process you have to keep the the Space-bar pressed while in "Auto".
+It will open a window with the camera stream and two buttons, "Auto" and "Manual". If you select "Manual" you can control the drone manually. If you select "Auto" the drone will compute the search area according to the user input. For the drone to perform the search you have to keep the the Space-Bar pressed while in "Auto".
 
 
 ### 4. Controls
 | Key   | command          |
 |-------|------------------|
 | DOWN  | move back        |
-| UP    | move up          |
+| UP    | move forward     |
 | LEFT  | move left        |
 | RIGHT | move right       |
 | W     | move up          |
