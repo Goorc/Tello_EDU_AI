@@ -34,7 +34,7 @@ It will open a window with the camera stream and two buttons, "Auto" and "Manual
 | A     | rotate left      |
 | D     | rotate right     |
 | L     | Takeoff and Land |
-| SPACE | start search     |
+| SPACE | deadman switch   |
 
 ### 5. Known Issues
 ```bash
