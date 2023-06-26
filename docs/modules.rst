@@ -8,5 +8,5 @@ Tello_EDU_AI
    Detectors
    Gui
    Main
-   PersonDetection_Test
-   Spielwiese3
+
+

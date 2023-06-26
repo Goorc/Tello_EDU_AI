@@ -1,7 +1,0 @@
-KeyPressModule module
-=====================
-
-.. automodule:: KeyPressModule
-   :members:
-   :undoc-members:
-   :show-inheritance:
