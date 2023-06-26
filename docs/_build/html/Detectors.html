@@ -106,7 +106,7 @@
 <dd><p>Returns the coordinates of the biggest coherent green dot in the Image. Can be used as a test instead of the person tracker</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>image</strong> – input image to be analyzed</p>
+<dd class="field-odd"><p><strong>img</strong> – input image to be analyzed</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dictionary with position of tracked object and image size</p>
@@ -137,8 +137,11 @@ For a given image the system detects all Persons and generate a tracking positio
 <span class="sig-name descname"><span class="pre">detect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#Detectors.PersonDetectorYoloV7.detect" title="Permalink to this definition"></a></dt>
 <dd><p>main function which is called to detect a person in a given image and returns a trackin-position</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary of with the midpoint of the detected person and the size of the image</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img</strong> – input image to be analyzed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with position of tracked object and image size</p>
 </dd>
 </dl>
 </dd></dl>
