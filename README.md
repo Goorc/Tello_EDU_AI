@@ -7,7 +7,7 @@ The whole system is described in the following flowchart:
 
 ![Alt text](Tello_EDU_AI_FlowChart.png)
 
-Further documentation can be found under docs\_build\html\index.html
+Further in documentation can be found under docs\_build\html\index.html
 ### 2. Installation
 to install all neccessary packages, just run the following command:
 ```bash
