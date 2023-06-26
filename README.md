@@ -7,7 +7,7 @@ The whole system is described in the following flowchart:
 
 ![Alt text](misc/Tello_EDU_AI_FlowChart.png)
 
-A more detailed documentation can be found under [docs\_build\html\index.html](docs/_build/html) as a .html page, just open intex.html in your browser of choice.
+A more detailed documentation can be found under [docs\_build\html](docs/_build/html) as a .html page, just open intex.html in your browser of choice.
 ### 2. Installation
 to install all neccessary packages, just run the following command:
 ```bash
