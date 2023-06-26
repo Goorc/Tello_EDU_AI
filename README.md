@@ -5,7 +5,7 @@ This Repository aims to show a potentzail use-case of the [Tello drone](https://
 The general idea of this project is to use the drone as simple search drone. It can searchs for persons in a given area. When a person is found, the drone will look at the persons and keep her in the camera center. If there is no person detected, the drone will follow a list of waypoints. At any given time the user is able to overwrite the current state and take control of the drone.
 The whole system is described in the following flowchart:
 
-![Alt text](Tello_EDU_AI_FlowChart.png)
+![Alt text](misc/Tello_EDU_AI_FlowChart.png)
 
 Further in documentation can be found under docs\_build\html\index.html
 ### 2. Installation
