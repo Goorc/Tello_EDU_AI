@@ -9,13 +9,13 @@ The whole system is described in the following flowchart:
 
 A more detailed documentation can be found under [docs\_build\html](docs/_build/html) as a .html page, just open intex.html in your browser of choice.
 ### 2. Installation
-to install all neccessary packages, just run the following command:
+To install all neccessary packages, just run the following command:
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Usage
-before starting the program you have to connect to the drone via Wi-Fi. To start the program, just run the following command:
+Before starting the program you have to connect to the drone via wifi. To start the program, just run the following command:
 ```bash
 python main.py
 ```
