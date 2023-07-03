@@ -22,7 +22,7 @@ class WaypointNavigation:
         self.position = {}
         self.previous_state = {}
         self.search_parameters = {"width": 0, "depth": 0, "distance": 9}
-        self.control_input_range = {"maxlr": 60, "minlr": 20, "maxfb": 60, "minfb": 20, "maxud": 100, "minud": 0,
+        self.control_input_range = {"maxlr": 40, "minlr": 20, "maxfb": 40, "minfb": 20, "maxud": 100, "minud": 0,
                                "maxyv": 70, "minyv": 0}
         self.relative_waypoints = []
         self.waypoints = []
